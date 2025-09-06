@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otel Dehşeti: Yeniden İnşa Edilmiş Sürüm</title>
+    <title>Otel Dehşeti: Uğursuz Genişleme</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
         :root {
             --primary-bg: #0a0a0a; --secondary-bg: #1a1a1a; --text-color: #e0e0e0;
             --door-color: #4a2c2a; --door-frame-color: #3b2321; --knob-color: #ffd700;
-            --danger-color: #aa0000; --safe-color: #008a00;
+            --danger-color: #aa0000; --safe-color: #008a00; --hush-color: #8b008b;
             --coin-color: #f7b731; --achievement-color: #4a90e2; --light-room-color: rgba(255, 253, 230, 0.1);
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -26,6 +26,13 @@
         @keyframes keyGlow { 0%, 100% { filter: drop-shadow(0 0 3px #ffd700); } 50% { filter: drop-shadow(0 0 10px #fffb00); } }
         @keyframes guidingLightGlow { 0% { background-color: var(--secondary-bg); } 50% { background-color: var(--light-room-color); } 100% { background-color: var(--secondary-bg); } }
         @keyframes pulseDanger { 0%, 100% { box-shadow: 0 0 40px rgba(0,0,0,0.8); } 50% { box-shadow: 0 0 60px 20px rgba(170, 0, 0, 0.5); } }
+        @keyframes pulseAmbush { 0%, 100% { box-shadow: 0 0 40px rgba(0,0,0,0.8); } 50% { box-shadow: 0 0 60px 20px rgba(139, 0, 139, 0.5); } }
+        @keyframes hushVignette { 0% { box-shadow: inset 0 0 100px 20px rgba(139,0,139, 0.3); } 50% { box-shadow: inset 0 0 120px 40px rgba(139,0,139, 0.6); } 100% { box-shadow: inset 0 0 100px 20px rgba(139,0,139, 0.3); } }
+        @keyframes mimicBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        @keyframes doorNumberFlow { 0% { text-shadow: 2px 2px 5px #000; } 50% { text-shadow: 2px 2px 15px #000, 0 0 5px var(--knob-color); transform: translateY(-2px); } 100% { text-shadow: 2px 2px 5px #000; } }
+        @keyframes timerBar { from { width: 100%; } to { width: 0%; } }
+        @keyframes screechVignette { 0%, 100% { box-shadow: none; } 50% { box-shadow: inset 0 0 150px 50px rgba(10,0,10,0.8); } }
+
         body { background-color: var(--primary-bg); color: var(--text-color); font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .horror-font { font-family: 'Metal Mania', cursive; letter-spacing: 2px; }
         .screen { display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; background: var(--primary-bg) radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); animation: fadeIn 1s; position: absolute; z-index: 200; }
@@ -62,30 +69,34 @@
         .achievement-details p { font-size: 0.9em; margin: 0; color: #aaa; }
         #game-container { width: 900px; height: 700px; border: 5px solid var(--door-frame-color); background-color: var(--secondary-bg); box-shadow: 0 0 40px rgba(0,0,0,0.8); position: relative; display: none; flex-direction: column; transition: all 0.5s; overflow: hidden; }
         #game-container.rush-warning { animation: pulseDanger 1.5s infinite; }
+        #game-container.ambush-warning { animation: pulseAmbush 1.2s infinite; }
+        #game-container.hush-active { animation: hushVignette 2s infinite ease-in-out; }
+        #game-container.screech-cue { animation: screechVignette 0.3s ease-in-out; }
         #room { flex-grow: 1; padding: 20px; position: relative; display: grid; align-items: center; justify-items: center; box-sizing: border-box; grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr; grid-template-rows: 1fr 1.5fr 1fr; }
         #room.shaking { animation: screenShakeIntense 0.5s; }
         #room.flickering { animation: lightFlicker 0.2s steps(2, end) 5; }
         #game-container.dark-room { background-color: #000; } #game-container.dim-room { background-color: #080808; }
         #game-container.light-room-special { animation: guidingLightGlow 5s infinite; }
+        #game-container.flooded-room::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40%; background: linear-gradient(to top, rgba(20, 40, 80, 0.6), transparent); pointer-events: none; z-index: 5; }
         
-        #ui-container {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-            font-size: 1.8em;
-        }
-        #ui-container > *, #ui-container #inventory {
-            text-shadow: 2px 2px 4px #000;
-        }
+        #ui-container { position: absolute; top: 15px; left: 20px; right: 20px; z-index: 10; display: flex; justify-content: space-between; align-items: flex-start; font-size: 1.8em; pointer-events: none; }
+        #ui-container > div { display: flex; flex-direction: column; gap: 5px; pointer-events: all; }
+        #ui-left-hud { align-items: flex-start; }
+        #ui-right-hud { align-items: flex-end; }
+        #ui-container > div > *, #ui-container #inventory { text-shadow: 2px 2px 4px #000; }
+        #hush-indicator { font-size: 1.5em; transition: color 0.5s; color: var(--safe-color); }
+        #next-room-hint { font-size: 1.5em; }
+        #item-timers-container { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; align-items: center; width: 300px; }
+        .item-timer { background-color: rgba(0,0,0,0.7); border: 1px solid var(--achievement-color); border-radius: 5px; padding: 5px 10px; width: 100%; color: white; display: flex; align-items: center; gap: 10px; }
+        .timer-bar-bg { flex-grow: 1; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; }
+        .timer-bar { height: 100%; background-color: var(--achievement-color); border-radius: 5px; }
 
         #inventory { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
         .item-icon { cursor: help; font-size: 1.1em; }
+        .item-icon.usable { cursor: pointer; filter: drop-shadow(0 0 5px #fff); transition: transform 0.2s; }
+        .item-icon.usable:hover { transform: scale(1.15); }
         #inventory .key-icon.glowing { animation: keyGlow 1.5s infinite; }
+        
         #central-message { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 3px solid var(--danger-color); padding: 15px 30px; border-radius: 10px; font-size: 2.5em; z-index: 100; display: none; text-align: center; }
         #jumpscare-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: black; display: none; justify-content: center; align-items: center; z-index: 999; animation: fadeIn 0.1s; }
         #jumpscare-image { max-width: 90%; max-height: 90%; }
@@ -101,19 +112,24 @@
         .hiding-spot.hiding { outline: 3px solid var(--safe-color); box-shadow: 0 0 15px var(--safe-color); }
         .searchable { width: 100px; height: 80px; background-color: #5a3d3a; border: 5px solid #3b2321; }
         .searchable.searched { background-color: #4a2c2a; opacity: 0.7; pointer-events: none; }
-        .floor-coin { font-size: 2em; cursor: pointer; transition: transform 0.2s; filter: drop-shadow(0 0 5px var(--coin-color)); position: absolute; }
-        .floor-coin:hover { transform: scale(1.2); }
+        .searchable.mimic-cue, .hiding-spot.mimic-cue { animation: mimicBreathe 4s infinite ease-in-out; }
+        .door-number.mimic-cue { animation: doorNumberFlow 2s infinite ease-in-out; }
+        .floor-coin, .floor-item { font-size: 2em; cursor: pointer; transition: transform 0.2s; position: absolute; }
+        .floor-coin:hover, .floor-item:hover { transform: scale(1.2); }
+        .floor-coin { filter: drop-shadow(0 0 5px var(--coin-color)); }
+        .floor-item { filter: drop-shadow(0 0 5px #fff); }
         .floor-key { font-size: 2.5em; position: absolute; filter: drop-shadow(0 0 8px var(--knob-color)); animation: keyGlow 1.5s infinite alternate; transition: transform 0.2s; cursor:pointer; }
         .floor-key:hover { transform: scale(1.2) rotate(10deg); }
         .screech-target { position: absolute; width: 50px; height: 50px; border-radius: 50%; background-image: radial-gradient(circle, rgba(200, 200, 255, 0.2) 0%, rgba(200, 200, 255, 0) 70%); }
         .screech-target.visible { background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%); width: 80px; height: 80px; box-shadow: 0 0 15px white; }
+        .eye-entity { position: absolute; width: 40px; height: 25px; background: radial-gradient(circle, #fff 10%, #f00 30%, #400 60%); border-radius: 50%; opacity: 0.8; box-shadow: 0 0 15px #f00; transition: transform 0.5s, opacity 0.5s; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div id="main-menu" class="screen">
         <h1 class="horror-font" data-lang-key="main_title">Otel Dehşeti</h1>
-        <h2 class="horror-font" data-lang-key="main_subtitle">Director's Cut</h2>
+        <h2 class="horror-font" data-lang-key="main_subtitle">Uğursuz Genişleme</h2>
         <div id="player-stats">
             <span data-lang-key="high_score">🏆 Yüksek Skor</span>: <span id="high-score-display">0</span> | <span data-lang-key="total_coins">💰 Toplam Para</span>: <span id="total-coins-display">0</span>
         </div>
@@ -122,6 +138,7 @@
             <div class="row">
                 <button id="how-to-play-button" class="screen-button horror-font" data-lang-key="how_to_play_button" style="font-size: 1.4em;">Nasıl Oynanır?</button>
                 <button id="achievements-button" class="screen-button horror-font" data-lang-key="achievements_button" style="font-size: 1.4em;">Başarımlar</button>
+                 <button id="lore-button" class="screen-button horror-font" data-lang-key="lore_button" style="font-size: 1.4em;">Lobi Günlüğü</button>
                 <button id="settings-button" class="screen-button horror-font" data-lang-key="settings_button" style="font-size: 1.4em;">Ayarlar</button>
             </div>
              <button id="reset-data-button" class="screen-button horror-font" data-lang-key="reset_button">Verileri Sıfırla</button>
@@ -152,6 +169,11 @@
         <div id="how-to-play-content" class="list-container"></div>
         <button class="back-to-menu-button screen-button horror-font" style="background-color: #555;" data-lang-key="back_button">Geri</button>
     </div>
+     <div id="lore-screen" class="screen">
+        <h1 class="horror-font" data-lang-key="lore_title">Lobi Günlüğü</h1>
+        <div id="lore-content" class="list-container"></div>
+        <button class="back-to-menu-button screen-button horror-font" style="background-color: #555;" data-lang-key="back_button">Geri</button>
+    </div>
     <div id="settings-screen" class="screen">
         <h1 class="horror-font" data-lang-key="settings_title">Ayarlar</h1>
         <div id="settings-content" class="list-container">
@@ -172,17 +194,26 @@
         <h1 id="game-over-title" class="horror-font">OYUN BİTTİ</h1>
         <p id="game-over-reason" style="font-size: 1.4em; color: var(--danger-color);"></p>
         <p id="run-summary" style="font-size: 1.5em;"></p>
+        <div id="run-stats" class="list-container" style="height: auto; max-height: 40vh; margin-top: 20px;"></div>
         <button id="return-to-lobby-button" class="screen-button horror-font" data-lang-key="back_to_lobby_button">Lobiye Dön</button>
     </div>
     <div id="jumpscare-overlay"><img id="jumpscare-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAM1BMVEX///8AAAD////MzMz////8/Pz////39/f29vb6+vrx8fH09PTt7e3n5+fl5eXi4uLe3t7b29tKGGsVAAAAy0lEQVR4nO3cSQ7CMAwEwNL9/4+7h5QxIDGDbLylkPJ1gQAAd+12u9fr9b6+7//5dAaAw+EQAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAIEDAnz7/4fL6QEAgQIEigQIECAQFCBAgACBAgECAgQIBAkQIEAgQFAQIECAAIEDAQIECBAIEiBAgACBAgECAgQIBAkQIEAgQFAQIECAAIEDAjw8AwDgv24/gZ+dD3fP9wAAAABJRU5ErkJggg==" alt="Jumpscare"/></div>
     <div id="achievement-popup" class="horror-font"></div>
+
     <div id="game-container">
         <div id="central-message" class="horror-font"></div>
+        <div id="item-timers-container"></div>
         <div id="room"></div>
         <div id="ui-container">
-            <span id="door-counter" class="horror-font"></span>
-            <span id="coin-counter" class="horror-font"></span>
-            <div id="inventory"></div>
+            <div id="ui-left-hud">
+                <span id="door-counter" class="horror-font"></span>
+                <span id="coin-counter" class="horror-font"></span>
+            </div>
+            <div id="ui-right-hud">
+                <div id="inventory"></div>
+                 <span id="hush-indicator">🤫</span>
+                 <span id="next-room-hint"></span>
+            </div>
         </div>
     </div>
 
@@ -192,39 +223,47 @@
 
     const HotelHorrorGame = {
         config: {
-            SAVE_KEY: 'hotelHorrorSaveData_v1.5_guaranteedCloset', // Updated save key for the new logic
+            SAVE_KEY: 'hotelHorrorSaveData_v2.1_Malignant',
             GOAL_DOOR: 100,
             ITEMS: {
-                lighter: { price: 150, icon: '🔥'}, 
-                lockpick: { price: 100, icon: '🔧'},
-                flashlight: { price: 200, icon: '🔦', unique: true},
-                battery: { price: 80, icon: '🔋', requires: 'flashlight'},
-                skeleton_key: { price: 300, icon: '🗝️', unique: true },
-                lucky_charm: { price: 220, icon: '🍀' },
-                crucifix: { price: 500, icon: '✝️' }
+                lighter: { price: 150, icon: '🔥', lootable: true, lootChance: 0.1}, 
+                lockpick: { price: 100, icon: '🔧', lootable: true, lootChance: 0.08},
+                flashlight: { price: 200, icon: '🔦', unique: true, lootable: false},
+                battery: { price: 80, icon: '🔋', requires: 'flashlight', lootable: true, lootChance: 0.06},
+                skeleton_key: { price: 300, icon: '🗝️', unique: true, lootable: false },
+                lucky_charm: { price: 220, icon: '🍀', lootable: false },
+                crucifix: { price: 500, icon: '✝️', lootable: true, lootChance: 0.01 }, // Very rare loot
+                adrenaline_shot: { price: 250, icon: '💉', singleUse: true, lootable: true, lootChance: 0.04 },
+                music_box: { price: 180, icon: '🎶', singleUse: true, lootable: true, lootChance: 0.03 },
+                explorers_journal: { price: 400, icon: '📖', unique: true, lootable: false }
             },
             ACHIEVEMENTS: {
                 first_step: {}, ten_doors: {}, fifty_doors: {}, hundred_doors: {}, close_call: {},
                 look_at_me: {}, locksmith: {}, master_of_unlocking: {},
-                rich_boy: {}, death_by_rush: {}, death_by_screech: {}, guiding_light: {}
+                rich_boy: {}, death_by_rush: {}, death_by_screech: {}, guiding_light: {},
+                death_by_hush: {}, death_by_mimic: {}, silent_survivor: {}, watchful_eye: {}, master_historian: {}
             },
+            LORE_PAGES: 10,
             SOUNDS: {
-                door_open: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                door_open: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
                 flicker: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAAg4ADSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/7WEEAABA/oAAGoAABpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//tYQYAAAD/AAD/+1Y8QAAAAAAAAD/+1gBAAAAP/6AAAaAAAAAgCASjkz/8J3e/93d3d3d3d3d3d3d3d3d3d3d3d3dENd3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d-Zz0K',
-                rush: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                game_over: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                jumpscare_sound: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                screech_psst: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                key_found: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                coin_sound: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                achievement_unlocked: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
-                victory: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K'
+                rush: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                game_over: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                jumpscare_sound: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                screech_psst: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                key_found: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                coin_sound: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                achievement_unlocked: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                victory: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                music_box_sound: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K',
+                page_found: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//tYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAExhdmY1OC40NS4xMADCqgCAARxrCwAATGF2YzU4LjQ1LjEwMAAAAAAAAAAAAAAA/+1hAQABA/oAulsdG2uXlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW-YAmAAG/FhCvoACQACgA4AABlCawAABuVoAFQAAAAAV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1-Zz0K'
             },
             LANG: {
                 'tr': {
-                    main_title: "Otel Dehşeti", main_subtitle: "Director's Cut", high_score: "🏆 Yüksek Skor", total_coins: "💰 Toplam Para",
+                    main_title: "Otel Dehşeti", main_subtitle: "Uğursuz Genişleme", high_score: "🏆 Yüksek Skor", total_coins: "💰 Toplam Para",
                     start_button: "Dükkan / Oyuna Başla", how_to_play_button: "Nasıl Oynanır?", achievements_button: "Başarımlar",
                     settings_button: "Ayarlar", reset_button: "Verileri Sıfırla", back_button: "Geri", back_to_lobby_button: "Lobiye Dön",
+                    lore_button: "Lobi Günlüğü", lore_title: "Lobi Günlüğü",
                     shop_title: "Dükkan", your_coins: "Paran", shop_buy_title: "Satın Al", your_equipment: "Ekipmanların", start_run_button: "Koşuya Başla",
                     buy_button: "Satın Al", no_items: "Henüz bir şey almadın.",
                     item_lighter_name: 'Çakmak 🔥', item_lighter_desc: 'Screech odasını hafifçe aydınlatır, tepki süreni artırır.',
@@ -233,7 +272,10 @@
                     item_battery_name: 'Pil 🔋', item_battery_desc: 'El Fenerine +10 kullanım hakkı ekler. El fenerin olmalı.',
                     item_skeleton_key_name: 'İskelet Anahtar 🗝️', item_skeleton_key_desc: '3 kilitli kapıyı açar. Sonra kırılır.',
                     item_lucky_charm_name: 'Şans Tılsımı 🍀', item_lucky_charm_desc: 'Koşu boyunca bulduğun para miktarını %50 artırır.',
-                    item_crucifix_name: 'Haç ✝️', item_crucifix_desc: 'Bir varlığı sana saldırmadan önce kovar. Çok güçlü ve tek kullanımlık.',
+                    item_crucifix_name: 'Haç ✝️', item_crucifix_desc: 'Bir varlığı kovar. Ambush ve Hush\'a karşı başarısız olabilir. Tek kullanımlık.',
+                    item_adrenaline_shot_name: 'Adrenalin İğnesi 💉', item_adrenaline_shot_desc: 'Kullanıldığında 2 saniyeliğine hız patlaması yaşatır. Rush\'tan kaçmak için son bir şans.',
+                    item_music_box_name: 'Müzik Kutusu 🎶', item_music_box_desc: '10 saniyeliğine yakındaki çoğu varlığı yatıştırır. Rush ve Ambush\'ı geciktirebilir.',
+                    item_explorers_journal_name: 'Keşifçi Günlüğü 📖', item_explorers_journal_desc: 'Bir sonraki odanın tehlikesi hakkında ipucu verir.',
                     achievements_title: "Başarımlar",
                     ach_first_step_name: 'İlk Adım', ach_first_step_desc: 'İlk kapını aç.', ach_ten_doors_name: 'Acemi Kaşif', ach_ten_doors_desc: '10. kapıya ulaş.',
                     ach_fifty_doors_name: 'Usta Kaşif', ach_fifty_doors_desc: '50. kapıya ulaş.', ach_hundred_doors_name: 'Otelden Kaçış', ach_hundred_doors_desc: '101. kapıya ulaş ve otelden kaç!',
@@ -242,29 +284,55 @@
                     ach_master_of_unlocking_name: 'Kilit Ustası', ach_master_of_unlocking_desc: 'Bir kapıyı maymuncukla veya iskelet anahtarla aç.',
                     ach_rich_boy_name: 'Zengin Çocuk', ach_rich_boy_desc: 'Tek bir koşuda 100 para topla.',
                     ach_death_by_rush_name: 'Hızlı Son', ach_death_by_rush_desc: 'Rush veya Ambush tarafından yakalan.', ach_death_by_screech_name: 'Arkana Bakma', ach_death_by_screech_desc: 'Screech tarafından yakalan.', ach_guiding_light_name: 'Bir Anlık Huzur', ach_guiding_light_desc: 'Rehber Işık odasını bul.',
+                    ach_death_by_hush_name: 'Ölümcül Sessizlik', ach_death_by_hush_desc: 'Hush\'ı rahatsız etmenin bedelini öde.', ach_death_by_mimic_name: 'Açgözlülüğün Sonu', ach_death_by_mimic_desc: 'Bir Taklitçi tarafından kandırıl.',
+                    ach_silent_survivor_name: 'Sessiz Kurtulan', ach_silent_survivor_desc: 'Hush\'ın avından 5 kez canlı çık.', ach_watchful_eye_name: 'Dikkatli Göz', ach_watchful_eye_desc: 'Bir Gözler odasını hasar almadan geç.',
+                    ach_master_historian_name: 'Usta Tarihçi', ach_master_historian_desc: 'Otelin tüm sırlarını açığa çıkar.',
                     game_over: "OYUN BİTTİ", victory: "ZAFER!", caught: "YAKALANDIN!", door_ui: "KAPI", coins_ui: "PARA",
-                    reason_rush: "Rush geldiğinde saklanmadın!", reason_ambush: "Ambush'ın dönüşlerini atlatamadın!",
+                    reason_rush: "Rush geldiğinde saklanmadın!", reason_ambush: "Ambush'ın mor parıltılı dönüşlerini atlatamadın!",
                     reason_screech_timeout: "Çok geç kaldın. Screech seni yakaladı!", reason_screech_door: "Arkanı dönmemeliydin. Screech seni yakaladı!",
+                    reason_hush: "Sessizliğe saygı göstermeliydin. Hush seni duydu.", reason_mimic: "Her parlayan şey altın değildir. O bir Taklitçi'ydi!",
+                    reason_crucifix_failed: "Haç, bu güçlü varlığa karşı koyamadı!",
                     run_summary_text: (d, c, bc) => `Bu koşuda <span class="horror-font">${d}</span> kapı geçtin, <span class="horror-font" style="color:var(--coin-color)">${bc} 💰</span> toplayıp, tılsımla <span class="horror-font" style="color:var(--safe-color)">+${c - bc} 💰</span> bonus kazandın!`,
                     run_summary_text_no_charm: (d, c) => `Bu koşuda <span class="horror-font">${d}</span> kapı geçtin ve <span class="horror-font" style="color:var(--coin-color)">${c} 💰</span> kazandın.`,
                     msg_no_hide: "Şu an saklanmak için bir neden yok.", msg_hiding: "Saklandın...", msg_locked_door: "KAPI KİLİTLİ! Anahtarı bul.",
                     msg_lockpick_used: "Maymuncuk kullandın!", msg_skeleton_key_used: "İskelet Anahtar kullandın!", msg_guiding_light: "Rehber Işık seni kutsadı.", msg_rush_approaches: "Bir ses yaklaşıyor... SAKLAN!",
                     msg_still_here: "Hala burada!", msg_danger_passed: "Tehlike geçti... şimdilik.", 
                     msg_screech_psst: "Psst...", msg_screech_scared: "Onu korkuttun!",
-                    msg_crucifix_used: "Haç varlığı kovdu!", msg_treasure_room: "Burası bir hazine odası gibi görünüyor!",
+                    msg_crucifix_used: "Haç varlığı kovdu!", msg_item_found: (name) => `${name} buldun!`,
+                    msg_treasure_room: "Burası bir hazine odası gibi görünüyor!",
+                    msg_adrenaline_used: "Adrenalin patlaması!", msg_music_box_playing: "Sakinleştirici bir melodi çalıyor...",
+                    msg_hush_warning: "ÇOK GÜRÜLTÜLÜSÜN!", msg_hush_active: "KI-MIR-DA-MA!", msg_hush_safe: "Sessizlik geçti.",
+                    msg_eyes_room: "Seni izliyorlar... Gözlerine bakma.",
                     htp_title: "Nasıl Oynanır?", htp_objective_h: "AMAÇ", htp_objective_p: "Otelden kaçmak için 100. kapıya ulaş. Her oda rastgele oluşturulur. Dükkandan aldığın eşyalar hayatta kalmana yardımcı olacak.",
-                    htp_entities_h: "VARLIKLAR", htp_entities_p: "Otelde yalnız değilsin:", htp_rush_h: "RUSH & AMBUSH", htp_rush_p: "Işıklar yanıp sönmeye başladığında ve bir gürültü duyduğunda hemen dolap gibi bir yere SAKLAN! Ambush birden fazla kez geçebilir, o gidene kadar bekle.",
+                    htp_entities_h: "VARLIKLAR", htp_entities_p: "Otelde yalnız değilsin:", htp_rush_h: "RUSH & AMBUSH", htp_rush_p: "Işıklar kırmızı yanıp sönmeye başladığında ve bir gürültü duyduğunda hemen dolap gibi bir yere SAKLAN! Işıklar mor yanıp sönüyorsa, bu Ambush'tır ve birden fazla kez geçebilir, o gidene kadar bekle.",
                     htp_screech_h: "SCREECH", htp_screech_p: "Karanlık bir odaya girersen ve 'Psst' sesi duyarsan, hemen etrafına bakıp onu bul ve üzerine tıkla. Kapıya doğru gidersen veya zamanında bulamazsan saldırır.",
-                    htp_items_h: "EŞYALAR VE ODALAR", htp_items_p: "Odaları araştırarak para ve anahtar bulabilirsin. Dükkan eşyaları (Çakmak, El Feneri, Haç vb.) hayatta kalma şansını artırır. Bu eşyalar tek koşuluktur ve her koşu için tekrar alınmalıdır.",
-                    settings_title: "Ayarlar", language_setting: "Dil", reset_confirm: "Tüm ilerlemen (yüksek skor, paralar, başarımlar) silinecek. Emin misin?", reset_done: "Veriler sıfırlandı.",
+                    htp_hush_h: "HUSH", htp_hush_p: "Görünmez ve sese duyarlıdır. Çok fazla gürültü yaparsan (hızlı arama, kapıları çarpma), avlanmaya başlar. Ekranın kenarları morardığında ve sesler kesildiğinde, tamamen hareketsiz kalmalısın!",
+                    htp_eyes_h: "EYES", htp_eyes_p: "Bir odadaki duvarlar gözlerle dolduğunda, onlara doğrudan bakmaktan kaçın. Hızla kapıya ilerle. Işık, onları geçici olarak kapatabilir.",
+                    htp_mimic_h: "MIMIC", htp_mimic_p: "Dolapların veya kapıların kılığına girer. Etkileşime geçmeden önce dikkatlice incele. Titreşen bir kapı numarası veya hafifçe 'nefes alan' bir dolap kötüye işarettir.",
+                    htp_items_h: "EŞYALAR VE ODALAR", htp_items_p: "Odaları araştırarak para, anahtar ve hatta dükkân eşyaları bulabilirsin! Dükkan eşyaları hayatta kalma şansını artırır.",
+                    settings_title: "Ayarlar", language_setting: "Dil", reset_confirm: "Tüm ilerlemen (yüksek skor, paralar, başarımlar, günlük sayfaları) silinecek. Emin misin?", reset_done: "Veriler sıfırlandı.",
                     ach_unlocked_popup: (name) => `🏆 Başarım Kazanıldı! <br> "${name}"`,
+                    lore_page_found: "Bir günlük sayfası buldun!", no_lore_pages: "Henüz otelin sırlarını bulamadın.",
                     not_enough_coins: "Yeterli paran yok!",
-                    item_key_title: "Oda Anahtarı", item_key_desc: "Kilitli kapıyı açar."
+                    item_key_title: "Oda Anahtarı", item_key_desc: "Kilitli kapıyı açar.",
+                    run_stats_title: "Koşu İstatistikleri", stat_encounters: "Karşılaşmalar", stat_items_used: "Kullanılan Eşyalar", stat_lore_found: "Bulunan Günlük Sayfaları",
+                    lore_page_title: (num) => `Sayfa ${num}`,
+                    lore_page_1: "...Bu otel bir tuzak. Girdiğim andan itibaren bir şeylerin yanlış olduğunu biliyordum. Kapılar... sanki canlı gibiler. Her geçtiğimde koridorlar değişiyor. Buradan bir çıkış yolu olmalı.",
+                    lore_page_2: "Gürültüden nefret ediyor. Dün gece bir vazo düşürdüm. Anında... odadaki tüm hava çekildi. Nefesimi tuttum. Kımıldamadım. Gittiğini hissettim. Sessiz olmalıyım. Her zaman.",
+                    lore_page_3: "Onu duydum. Işıklar titreştiğinde gelen o korkunç sesi. Dolaba saklandım. Bütün oda sarsıldı. Geçip gitti. Şanslıydım. Bir dahaki sefere bu kadar şanslı olamayabilirim.",
+                    lore_page_4: "Karanlıkta fısıldıyor. 'Psst'. İlk başta aklımı kaçırdığımı sandım. Ama gerçek. Onu bulup yüzleşmelisin, yoksa... Arkadaşım arkasını döndü. Bir daha onu görmedim.",
+                    lore_page_5: "Duvarlar... bana bakıyor. Gözlerini her yerde görüyorum. Onlara bakınca başım dönüyor, midem bulanıyor. Sanki aklımı içiyorlar. Gözlerimi kaçırmalıyım. İleriye bakmalıyım.",
+                    lore_page_6: "Malzemelerim tükeniyor. Bir dolabı açtım, içinde erzak bulmayı umuyordum. Ama o... o bir dolap değildi. O anki dehşeti tarif edemem. Güvenme. Hiçbir şeye güvenme.",
+                    lore_page_7: "Bugün tuhaf bir oda buldum. Duvarlardan hafif, sıcak bir ışık sızıyordu. İçeri girdiğimde bir anlığına... huzur buldum. Korkum dindi. Otel bana acıdı mı, yoksa bu daha sinsi bir tuzak mı?",
+                    lore_page_8: "Bir anahtar buldum. Diğerlerine benzemiyordu, kemikten yapılmış gibiydi. Birkaç kilitli kapıyı açtı ama sonra elimde toza dönüştü. Bu otel, kurallarını kendi koyuyor.",
+                    lore_page_9: "Sahibinin ofisini bulduğuma inanıyorum. Masada bir haç vardı. Elime aldığımda bir güç hissettim. Belki... belki bu şeylere karşı savaşabilirim. Belki bir umut vardır.",
+                    lore_page_10: "100. kapı. Neredeyse oradayım. Günlüğümü burada bırakıyorum. Eğer bunu okuyorsan, ya ben başardım ya da otel beni de yuttu. Unutma: sessiz ol, arkana bakma, hiçbir şeye güvenme ve asla umudunu kaybetme."
                 },
                 'en': {
-                    main_title: "Hotel Horror", main_subtitle: "Director's Cut", high_score: "🏆 High Score", total_coins: "💰 Total Coins",
+                    main_title: "Hotel Horror", main_subtitle: "The Malignant Expansion", high_score: "🏆 High Score", total_coins: "💰 Total Coins",
                     start_button: "Shop / Start Game", how_to_play_button: "How to Play", achievements_button: "Achievements",
                     settings_button: "Settings", reset_button: "Reset Data", back_button: "Back", back_to_lobby_button: "Return to Lobby",
+                    lore_button: "Lobby Journal", lore_title: "Lobby Journal",
                     shop_title: "Shop", your_coins: "Your Coins", shop_buy_title: "Buy", your_equipment: "Your Equipment", start_run_button: "Start Run",
                     buy_button: "Buy", no_items: "You haven't bought anything yet.",
                     item_lighter_name: 'Lighter 🔥', item_lighter_desc: 'Slightly illuminates a Screech room, increasing your reaction time.',
@@ -273,7 +341,10 @@
                     item_battery_name: 'Battery 🔋', item_battery_desc: 'Adds +10 uses for the Flashlight. You must own a flashlight.',
                     item_skeleton_key_name: 'Skeleton Key 🗝️', item_skeleton_key_desc: 'Unlocks 3 locked doors, then breaks.',
                     item_lucky_charm_name: 'Lucky Charm 🍀', item_lucky_charm_desc: 'Increases coins found during the run by 50%.',
-                    item_crucifix_name: 'Crucifix ✝️', item_crucifix_desc: 'Repels an entity before it attacks. Very powerful, single use.',
+                    item_crucifix_name: 'Crucifix ✝️', item_crucifix_desc: 'Repels an entity. May fail against Ambush and Hush. Single use.',
+                    item_adrenaline_shot_name: 'Adrenaline Shot 💉', item_adrenaline_shot_desc: 'Upon use, grants a 2-second speed burst. A last chance to outrun Rush.',
+                    item_music_box_name: 'Music Box 🎶', item_music_box_desc: 'For 10 seconds, it pacifies most nearby entities. May delay Rush and Ambush.',
+                    item_explorers_journal_name: "Explorer's Journal 📖", item_explorers_journal_desc: 'Gives a hint about the danger in the next room.',
                     achievements_title: "Achievements",
                     ach_first_step_name: 'First Step', ach_first_step_desc: 'Open your first door.', ach_ten_doors_name: 'Novice Explorer', ach_ten_doors_desc: 'Reach door 10.',
                     ach_fifty_doors_name: 'Master Explorer', ach_fifty_doors_desc: 'Reach door 50.', ach_hundred_doors_name: 'Escape the Hotel', ach_hundred_doors_desc: 'Reach door 101 and escape the hotel!',
@@ -282,29 +353,252 @@
                     ach_master_of_unlocking_name: 'Master of Unlocking', ach_master_of_unlocking_desc: 'Open a door with a lockpick or skeleton key.',
                     ach_rich_boy_name: 'Rich Boy', ach_rich_boy_desc: 'Collect 100 coins in a single run.',
                     ach_death_by_rush_name: 'A Quick End', ach_death_by_rush_desc: 'Get caught by Rush or Ambush.', ach_death_by_screech_name: "Don't Look Back", ach_death_by_screech_desc: 'Get caught by Screech.', ach_guiding_light_name: 'A Moment of Peace', ach_guiding_light_desc: 'Find a Guiding Light room.',
+                    ach_death_by_hush_name: 'Deadly Silence', ach_death_by_hush_desc: 'Pay the price for disturbing Hush.', ach_death_by_mimic_name: 'Greed\'s Demise', ach_death_by_mimic_desc: 'Get fooled by a Mimic.',
+                    ach_silent_survivor_name: 'Silent Survivor', ach_silent_survivor_desc: 'Survive Hush\'s hunt 5 times.', ach_watchful_eye_name: 'Watchful Eye', ach_watchful_eye_desc: 'Pass through a room of Eyes without taking damage.',
+                    ach_master_historian_name: 'Master Historian', ach_master_historian_desc: 'Uncover all the secrets of the hotel.',
                     game_over: "GAME OVER", victory: "VICTORY!", caught: "CAUGHT!", door_ui: "DOOR", coins_ui: "COINS",
-                    reason_rush: "You didn't hide when Rush came!", reason_ambush: "You couldn't survive Ambush's returns!",
+                    reason_rush: "You didn't hide when Rush came!", reason_ambush: "You couldn't survive the purple glow of Ambush's returns!",
                     reason_screech_timeout: "You were too slow. Screech caught you!", reason_screech_door: "You shouldn't have turned your back. Screech caught you!",
+                    reason_hush: "You should have respected the silence. Hush heard you.", reason_mimic: "Not all that glitters is gold. That was a Mimic!",
+                    reason_crucifix_failed: "The Crucifix could not contain this powerful entity!",
                     run_summary_text: (d, c, bc) => `You passed <span class="horror-font">${d}</span> doors, collected <span class="horror-font" style="color:var(--coin-color)">${bc} 💰</span> and earned a <span class="horror-font" style="color:var(--safe-color)">+${c - bc} 💰</span> bonus with the charm!`,
                     run_summary_text_no_charm: (d, c) => `You passed <span class="horror-font">${d}</span> doors and earned <span class="horror-font" style="color:var(--coin-color)">${c} 💰</span> in this run.`,
                     msg_no_hide: "No reason to hide right now.", msg_hiding: "You are hiding...", msg_locked_door: "DOOR IS LOCKED! Find the key.",
                     msg_lockpick_used: "Used a lockpick!", msg_skeleton_key_used: "Used a Skeleton Key!", msg_guiding_light: "The Guiding Light blesses you.", msg_rush_approaches: "A sound is approaching... HIDE!",
                     msg_still_here: "It's still here!", msg_danger_passed: "The danger has passed... for now.",
                     msg_screech_psst: "Psst...", msg_screech_scared: "You scared it away!",
-                    msg_crucifix_used: "The Crucifix repelled the entity!", msg_treasure_room: "This looks like a treasure room!",
+                    msg_crucifix_used: "The Crucifix repelled the entity!", msg_item_found: (name) => `You found a ${name}!`,
+                    msg_treasure_room: "This looks like a treasure room!",
+                    msg_adrenaline_used: "Adrenaline rush!", msg_music_box_playing: "A calming melody is playing...",
+                    msg_hush_warning: "YOU'RE BEING TOO LOUD!", msg_hush_active: "DO-NOT-MOVE!", msg_hush_safe: "The silence has passed.",
+                    msg_eyes_room: "They are watching you... Don't look at them.",
                     htp_title: "How to Play", htp_objective_h: "OBJECTIVE", htp_objective_p: "Reach door 100 to escape the hotel. Each room is randomly generated. Items from the shop will help you survive.",
-                    htp_entities_h: "ENTITIES", htp_entities_p: "You are not alone in the hotel:", htp_rush_h: "RUSH & AMBUSH", htp_rush_p: "When the lights start to flicker and you hear a roar, HIDE in a closet immediately! Ambush may pass multiple times, wait until it's gone.",
+                    htp_entities_h: "ENTITIES", htp_entities_p: "You are not alone in the hotel:", htp_rush_h: "RUSH & AMBUSH", htp_rush_p: "When the lights flicker red and you hear a roar, HIDE! If the lights flicker purple, it's Ambush and it may pass multiple times; wait until it's gone.",
                     htp_screech_h: "SCREECH", htp_screech_p: "If you enter a dark room and hear a 'Psst' sound, quickly look around, find it, and click on it. It will attack if you try to open the door or fail to find it in time.",
-                    htp_items_h: "ITEMS & ROOMS", htp_items_p: "You can find coins and keys by searching rooms. Shop items (Lighter, Flashlight, Crucifix etc.) will increase your chances of survival. These are single-run items and must be bought again for each run.",
-                    settings_title: "Settings", language_setting: "Language", reset_confirm: "All your progress (high score, coins, achievements) will be deleted. Are you sure?", reset_done: "Data has been reset.",
+                    htp_hush_h: "HUSH", htp_hush_p: "Invisible and sensitive to sound. If you make too much noise (searching quickly, slamming doors), it will start hunting. When the screen borders turn purple and sounds cut out, you must stay completely still!",
+                    htp_eyes_h: "EYES", htp_eyes_p: "When a room is filled with eyes, avoid looking directly at them. Move quickly to the door. Light can temporarily shut them.",
+                    htp_mimic_h: "MIMIC", htp_mimic_p: "Disguises itself as closets or even the next door. Observe carefully before interacting. A shimmering door number or a slightly 'breathing' closet is a bad sign.",
+                    htp_items_h: "ITEMS & ROOMS", htp_items_p: "You can find coins, keys, and even shop items by searching rooms! Shop items increase your chances of survival.",
+                    settings_title: "Settings", language_setting: "Language", reset_confirm: "All your progress (high score, coins, achievements, journal pages) will be deleted. Are you sure?", reset_done: "Data has been reset.",
                     ach_unlocked_popup: (name) => `🏆 Achievement Unlocked! <br> "${name}"`,
+                    lore_page_found: "You found a journal page!", no_lore_pages: "You haven't found any secrets of the hotel yet.",
                     not_enough_coins: "Not enough coins!",
-                    item_key_title: "Room Key", item_key_desc: "Opens the locked door."
+                    item_key_title: "Room Key", item_key_desc: "Opens the locked door.",
+                    run_stats_title: "Run Statistics", stat_encounters: "Encounters", stat_items_used: "Items Used", stat_lore_found: "Journal Pages Found",
+                    lore_page_title: (num) => `Page ${num}`,
+                    lore_page_1: "...This hotel is a trap. I knew something was wrong the moment I stepped in. The doors... they feel alive. The hallways change every time I pass through. There has to be a way out.",
+                    lore_page_2: "It hates noise. I dropped a vase last night. Instantly... the air in the room was sucked out. I held my breath. I didn't move. I felt it leave. I must be quiet. Always.",
+                    lore_page_3: "I heard it. That terrible sound that comes when the lights flicker. I hid in a closet. The whole room shook. It passed by. I was lucky. I might not be so lucky next time.",
+                    lore_page_4: "It whispers in the dark. 'Psst'. At first, I thought I was losing my mind. But it's real. You have to find it, face it, or... My friend turned his back. I never saw him again.",
+                    lore_page_5: "The walls... they stare at me. I see eyes everywhere. Looking at them makes my head spin, my stomach churn. It's like they're drinking my sanity. I must avert my gaze. Look forward.",
+                    lore_page_6: "My supplies are running low. I opened a locker, hoping to find supplies. But it... it wasn't a locker. I can't describe the horror of that moment. Trust nothing. Trust. Nothing.",
+                    lore_page_7: "Found a strange room today. A soft, warm light emanated from the walls. For a moment, when I stepped inside... I felt peace. My fear subsided. Was the hotel showing me mercy, or is this a more sinister trap?",
+                    lore_page_8: "I found a key. It didn't look like the others, felt like it was made of bone. It opened several locked doors, but then it crumbled to dust in my hand. This place makes its own rules.",
+                    lore_page_9: "I think I found the owner's office. There was a crucifix on the desk. When I picked it up, I felt a surge of power. Maybe... maybe I can fight back against these things. Maybe there's hope.",
+                    lore_page_10: "Door 100. I'm almost there. I'm leaving this journal here. If you're reading this, either I made it, or the hotel consumed me too. Remember: be quiet, don't look back, trust nothing, and never lose hope."
                 }
             }
         },
         state: { saveData: {}, gameState: {}, preRunInventory: {}, currentEvent: null, eventAbortController: null, },
         dom: {},
+        ui: { // Moved UI object up to be self-contained
+            achievementQueue: [],
+            isPopupActive: false,
+            showScreen(screenId) { this.hideAllScreens(); if (screenId && HotelHorrorGame.dom.screens[screenId]) { HotelHorrorGame.dom.screens[screenId].style.display = 'flex'; } },
+            hideAllScreens() { Object.values(HotelHorrorGame.dom.screens).forEach(s => s.style.display = 'none'); HotelHorrorGame.dom.gameContainer.style.display = 'none'; },
+            updateAllTexts() {
+                const lang = HotelHorrorGame.state.saveData.language || 'tr';
+                document.documentElement.lang = lang;
+                document.querySelectorAll('[data-lang-key]').forEach(el => { el.innerHTML = HotelHorrorGame.utils.getLangString(el.dataset.langKey); });
+                this.updateMainMenu(); this.renderHowToPlay(); this.renderLore();
+            },
+            updateMainMenu() { HotelHorrorGame.dom.highScoreDisplay.textContent = HotelHorrorGame.state.saveData.highScore; HotelHorrorGame.dom.totalCoinsDisplay.textContent = HotelHorrorGame.state.saveData.totalCoins; },
+            updateGameUI() {
+                const { gameState } = HotelHorrorGame.state;
+                const { getLangString } = HotelHorrorGame.utils;
+                HotelHorrorGame.dom.doorCounterEl.textContent = `${getLangString('door_ui')}: ${String(gameState.currentDoor).padStart(3, '0')}`;
+                let displayCoins = gameState.runCoins;
+                const hasCharm = 'lucky_charm' in gameState.items && gameState.items.lucky_charm > 0;
+                if (hasCharm) { displayCoins = Math.ceil(displayCoins * 1.5); }
+                HotelHorrorGame.dom.coinCounterEl.textContent = `${getLangString('coins_ui')}: ${displayCoins} ${hasCharm ? '🍀' : '💰'}`;
+                
+                const indicator = HotelHorrorGame.dom.hushIndicator;
+                const noiseRatio = Math.min(gameState.noiseLevel / 100, 1);
+                indicator.style.color = `rgb(${255 * noiseRatio}, ${255 * (1 - noiseRatio)}, 0)`;
+                indicator.textContent = noiseRatio > 0.7 ? '🤫‼️' : '🤫';
+                
+                HotelHorrorGame.dom.inventoryEl.innerHTML = '';
+                if (gameState.hasKey) {
+                    const keyEl = document.createElement('span');
+                    keyEl.className = 'key-icon glowing item-icon';
+                    keyEl.textContent = '🔑';
+                    keyEl.title = `${getLangString('item_key_title')} - ${getLangString('item_key_desc')}`;
+                    HotelHorrorGame.dom.inventoryEl.appendChild(keyEl);
+                }
+                for (const item in gameState.items) {
+                    if (gameState.items[item] > 0) {
+                        const itemData = HotelHorrorGame.config.ITEMS[item];
+                        const itemEl = document.createElement('span');
+                        itemEl.dataset.item = item;
+                        let isUsable = false;
+                        if(item === 'adrenaline_shot' && (gameState.currentEvent === 'rush' || gameState.currentEvent === 'ambush')) isUsable = true;
+                        if(item === 'music_box' && !gameState.musicBoxActive) isUsable = true;
+                        
+                        itemEl.className = `item-icon ${isUsable ? 'usable' : ''}`;
+                        itemEl.title = getLangString(`item_${item}_name`) + ' - ' + getLangString(`item_${item}_desc`);
+                        let usesText = '';
+                        if (item === 'flashlight' && gameState.itemUses.flashlight > 0) { usesText = ` (${gameState.itemUses.flashlight}⚡)`; } 
+                        else if (item === 'skeleton_key' && gameState.itemUses.skeleton_key > 0) { usesText = ` (${gameState.itemUses.skeleton_key}🔑)`; }
+                        const quantityText = gameState.items[item] > 1 ? `x${gameState.items[item]}` : '';
+                        itemEl.textContent = `${itemData.icon}${quantityText}${usesText}`;
+                        HotelHorrorGame.dom.inventoryEl.appendChild(itemEl);
+                    }
+                }
+                
+                const hintEl = HotelHorrorGame.dom.nextRoomHint;
+                if(gameState.items.explorers_journal > 0 && gameState.nextRoomHint) {
+                    const hintMap = { rush: '💨', screech: '💧', eyes: '👁️', ambush: '💜', safe: '🏠', mimic: '❓' };
+                    hintEl.textContent = hintMap[gameState.nextRoomHint] || '';
+                    hintEl.title = gameState.nextRoomHint;
+                } else { hintEl.textContent = ''; }
+            },
+            showCentralMessage(text, duration = 2000, style = 'danger') {
+                const el = HotelHorrorGame.dom.centralMessageEl;
+                el.textContent = text;
+                el.style.borderColor = `var(--${style}-color)`;
+                el.style.animation = '';
+                el.style.display = 'block';
+                if (duration > 0) { setTimeout(() => this.hideCentralMessage(), duration); }
+            },
+            hideCentralMessage() { if (HotelHorrorGame.dom.centralMessageEl) { HotelHorrorGame.dom.centralMessageEl.style.display = 'none'; } },
+            renderShop() {
+                const { dom, state, config, utils, gameplay } = HotelHorrorGame;
+                dom.shopItemsGrid.innerHTML = ''; dom.preRunItemsList.innerHTML = '';
+                const currentCost = gameplay.calculatePreRunCost();
+                dom.shopCoinsDisplay.textContent = `${state.saveData.totalCoins} (-${currentCost} 💰)`;
+                let hasItems = false;
+                if (state.preRunInventory.items) {
+                    for (const id in state.preRunInventory.items) {
+                        if (state.preRunInventory.items[id] > 0) {
+                            hasItems = true;
+                            let usesText = '';
+                            if (id === 'flashlight') usesText = ` (${state.preRunInventory.itemUses.flashlight}⚡)`;
+                            else if (id === 'skeleton_key') usesText = ` (${state.preRunInventory.itemUses.skeleton_key}🔑)`;
+                            const quantityText = state.preRunInventory.items[id] > 1 ? `x${state.preRunInventory.items[id]}` : '';
+                            dom.preRunItemsList.innerHTML += `<p>${utils.getLangString('item_'+id+'_name')} ${quantityText}${usesText}</p>`;
+                        }
+                    }
+                }
+                if (!hasItems) dom.preRunItemsList.innerHTML = `<p>${utils.getLangString('no_items')}</p>`;
+                const shopFragment = document.createDocumentFragment();
+                for (const id in config.ITEMS) {
+                    const item = config.ITEMS[id];
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'shop-item';
+                    let canBuy = (state.saveData.totalCoins - currentCost) >= item.price;
+                    if (item.unique && state.preRunInventory.items && state.preRunInventory.items[id] > 0) canBuy = false;
+                    if (item.requires && (!state.preRunInventory.items || !state.preRunInventory.items[item.requires])) canBuy = false;
+                    itemEl.innerHTML = `<h3 class="horror-font">${utils.getLangString('item_'+id+'_name')}</h3><p>${utils.getLangString('item_'+id+'_desc')}</p><p class="price">${item.price} 💰</p><button class="screen-button horror-font buy-button" data-item="${id}" ${!canBuy ? 'disabled' : ''}>${utils.getLangString('buy_button')}</button>`;
+                    shopFragment.appendChild(itemEl);
+                }
+                dom.shopItemsGrid.appendChild(shopFragment);
+            },
+            renderAchievements() {
+                const { dom, state, utils, config } = HotelHorrorGame;
+                dom.achievementsListContainer.innerHTML = '';
+                const achFragment = document.createDocumentFragment();
+                for (const id in config.ACHIEVEMENTS) {
+                    const isUnlocked = state.saveData.achievements[id];
+                    const achEl = document.createElement('div');
+                    achEl.className = `achievement ${isUnlocked ? 'unlocked' : ''}`;
+                    achEl.innerHTML = `<div class="achievement-icon">${isUnlocked ? '🏆' : '🔒'}</div><div class="achievement-details"><h3 class="horror-font">${utils.getLangString('ach_'+id+'_name')}</h3><p>${utils.getLangString('ach_'+id+'_desc')}</p></div>`;
+                    achFragment.appendChild(achEl);
+                }
+                dom.achievementsListContainer.appendChild(achFragment);
+            },
+            renderHowToPlay() { 
+                const { dom, utils } = HotelHorrorGame; 
+                dom.howToPlayContent.innerHTML = `
+                    <h3 class="horror-font">${utils.getLangString('htp_objective_h')}</h3><p>${utils.getLangString('htp_objective_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_entities_h')}</h3><p>${utils.getLangString('htp_entities_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_rush_h')}</h3><p>${utils.getLangString('htp_rush_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_screech_h')}</h3><p>${utils.getLangString('htp_screech_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_hush_h')}</h3><p>${utils.getLangString('htp_hush_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_eyes_h')}</h3><p>${utils.getLangString('htp_eyes_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_mimic_h')}</h3><p>${utils.getLangString('htp_mimic_p')}</p>
+                    <h3 class="horror-font">${utils.getLangString('htp_items_h')}</h3><p>${utils.getLangString('htp_items_p')}</p>`; 
+            },
+            renderLore() {
+                const { dom, state, utils, config } = HotelHorrorGame;
+                dom.loreContent.innerHTML = '';
+                if(state.saveData.foundLore.length === 0){
+                    dom.loreContent.innerHTML = `<p>${utils.getLangString('no_lore_pages')}</p>`;
+                    return;
+                }
+                const loreFragment = document.createDocumentFragment();
+                for(let i = 1; i <= config.LORE_PAGES; i++) {
+                    const isFound = state.saveData.foundLore.includes(i);
+                    const pageEl = document.createElement('div');
+                    pageEl.className = 'achievement'
+                    pageEl.style.opacity = isFound ? '1' : '0.4';
+                    pageEl.innerHTML = `
+                        <div class="achievement-icon">${isFound ? '📜' : '🔒'}</div>
+                        <div class="achievement-details">
+                            <h3 class="horror-font">${utils.getLangString('lore_page_title', i)}</h3>
+                            <p>${isFound ? utils.getLangString('lore_page_' + i) : '???'}</p>
+                        </div>`;
+                    loreFragment.appendChild(pageEl);
+                }
+                dom.loreContent.appendChild(loreFragment);
+            },
+            showAchievementPopup(id) {
+                const { state, persistence } = HotelHorrorGame;
+                if (id in state.saveData.achievements && !state.saveData.achievements[id]) {
+                    state.saveData.achievements[id] = true;
+                    persistence.save();
+                    this.achievementQueue.push(id);
+                    if (!this.isPopupActive) {
+                        this.processAchievementQueue();
+                    }
+                }
+            },
+            processAchievementQueue() {
+                if (this.achievementQueue.length === 0) {
+                    this.isPopupActive = false;
+                    return;
+                }
+                this.isPopupActive = true;
+                const id = this.achievementQueue.shift();
+                const { dom, utils, audio } = HotelHorrorGame;
+                
+                dom.achievementPopup.innerHTML = utils.getLangString('ach_unlocked_popup', utils.getLangString(`ach_${id}_name`));
+                dom.achievementPopup.style.display = 'block';
+                dom.achievementPopup.style.animation = 'slideIn 0.5s ease-out';
+                audio.play('achievement_unlocked');
+                
+                setTimeout(() => {
+                    dom.achievementPopup.style.animation = 'slideOut 0.5s ease-in forwards';
+                    setTimeout(() => {
+                        dom.achievementPopup.style.display = 'none';
+                        this.processAchievementQueue(); // Process next one
+                    }, 500);
+                }, 3000);
+            },
+            showItemTimer(itemId, duration) {
+                const { dom, config, utils } = HotelHorrorGame;
+                const timerId = `timer-${itemId}-${Date.now()}`;
+                const timerEl = document.createElement('div');
+                timerEl.className = 'item-timer';
+                timerEl.id = timerId;
+                timerEl.innerHTML = `
+                    <span>${config.ITEMS[itemId].icon}</span>
+                    <div class="timer-bar-bg">
+                        <div class="timer-bar" style="animation: timerBar ${duration / 1000}s linear;"></div>
+                    </div>`;
+                dom.itemTimersContainer.appendChild(timerEl);
+                setTimeout(() => timerEl.remove(), duration);
+            }
+        },
         audio: {
             context: null, buffers: {}, active: {},
             init() {
@@ -366,7 +660,10 @@
                 if (loadedData) {
                     try {
                         const parsedData = JSON.parse(loadedData);
-                        HotelHorrorGame.state.saveData = { ...defaultSave, ...parsedData, achievements: { ...defaultSave.achievements, ...(parsedData.achievements || {}) } };
+                         HotelHorrorGame.state.saveData = { ...defaultSave, ...parsedData, 
+                            achievements: { ...defaultSave.achievements, ...(parsedData.achievements || {}) },
+                            foundLore: [...(parsedData.foundLore || [])]
+                        };
                     } catch (e) { console.error("Failed to parse save data, resetting.", e); HotelHorrorGame.state.saveData = defaultSave; }
                 } else { HotelHorrorGame.state.saveData = defaultSave; }
             },
@@ -383,130 +680,21 @@
             createDefaultSaveData() {
                 const achievements = {};
                 for (const id in HotelHorrorGame.config.ACHIEVEMENTS) { achievements[id] = false; }
-                return { totalCoins: 0, highScore: 0, achievements, language: 'tr' };
-            }
-        },
-        ui: {
-            showScreen(screenId) { this.hideAllScreens(); if (screenId && HotelHorrorGame.dom.screens[screenId]) { HotelHorrorGame.dom.screens[screenId].style.display = 'flex'; } },
-            hideAllScreens() { Object.values(HotelHorrorGame.dom.screens).forEach(s => s.style.display = 'none'); HotelHorrorGame.dom.gameContainer.style.display = 'none'; },
-            updateAllTexts() {
-                const lang = HotelHorrorGame.state.saveData.language || 'tr';
-                document.documentElement.lang = lang;
-                document.querySelectorAll('[data-lang-key]').forEach(el => { el.innerHTML = HotelHorrorGame.utils.getLangString(el.dataset.langKey); });
-                this.updateMainMenu(); this.renderHowToPlay();
-            },
-            updateMainMenu() { HotelHorrorGame.dom.highScoreDisplay.textContent = HotelHorrorGame.state.saveData.highScore; HotelHorrorGame.dom.totalCoinsDisplay.textContent = HotelHorrorGame.state.saveData.totalCoins; },
-            updateGameUI() {
-                const { gameState } = HotelHorrorGame.state;
-                const { getLangString } = HotelHorrorGame.utils;
-                HotelHorrorGame.dom.doorCounterEl.textContent = `${getLangString('door_ui')}: ${String(gameState.currentDoor).padStart(3, '0')}`;
-                let displayCoins = gameState.runCoins;
-                const hasCharm = 'lucky_charm' in gameState.items && gameState.items.lucky_charm > 0;
-                if (hasCharm) { displayCoins = Math.ceil(displayCoins * 1.5); }
-                HotelHorrorGame.dom.coinCounterEl.textContent = `${getLangString('coins_ui')}: ${displayCoins} ${hasCharm ? '🍀' : '💰'}`;
-                
-                HotelHorrorGame.dom.inventoryEl.innerHTML = '';
-                if (gameState.hasKey) {
-                    const keyEl = document.createElement('span');
-                    keyEl.className = 'key-icon glowing item-icon';
-                    keyEl.textContent = '🔑';
-                    keyEl.title = `${getLangString('item_key_title')} - ${getLangString('item_key_desc')}`;
-                    HotelHorrorGame.dom.inventoryEl.appendChild(keyEl);
-                }
-                for (const item in gameState.items) {
-                    if (gameState.items[item] > 0) {
-                        const itemData = HotelHorrorGame.config.ITEMS[item];
-                        const itemEl = document.createElement('span');
-                        itemEl.className = 'item-icon';
-                        itemEl.title = getLangString(`item_${item}_name`) + ' - ' + getLangString(`item_${item}_desc`);
-                        let usesText = '';
-                        if (item === 'flashlight' && gameState.itemUses.flashlight > 0) { usesText = ` (${gameState.itemUses.flashlight}⚡)`; } 
-                        else if (item === 'skeleton_key' && gameState.itemUses.skeleton_key > 0) { usesText = ` (${gameState.itemUses.skeleton_key}🔑)`; }
-                        const quantityText = gameState.items[item] > 1 ? `x${gameState.items[item]}` : '';
-                        itemEl.textContent = `${itemData.icon}${quantityText}${usesText}`;
-                        HotelHorrorGame.dom.inventoryEl.appendChild(itemEl);
-                    }
-                }
-            },
-            showCentralMessage(text, duration = 2000, style = 'danger') {
-                const el = HotelHorrorGame.dom.centralMessageEl;
-                el.textContent = text;
-                el.style.borderColor = `var(--${style}-color)`;
-                el.style.animation = '';
-                el.style.display = 'block';
-                if (duration > 0) { setTimeout(() => this.hideCentralMessage(), duration); }
-            },
-            hideCentralMessage() { if (HotelHorrorGame.dom.centralMessageEl) { HotelHorrorGame.dom.centralMessageEl.style.display = 'none'; } },
-            renderShop() {
-                const { dom, state, config, utils, gameplay } = HotelHorrorGame;
-                dom.shopItemsGrid.innerHTML = ''; dom.preRunItemsList.innerHTML = '';
-                const currentCost = gameplay.calculatePreRunCost();
-                dom.shopCoinsDisplay.textContent = `${state.saveData.totalCoins} (-${currentCost} 💰)`;
-                let hasItems = false;
-                if (state.preRunInventory.items) {
-                    for (const id in state.preRunInventory.items) {
-                        if (state.preRunInventory.items[id] > 0) {
-                            hasItems = true;
-                            let usesText = '';
-                            if (id === 'flashlight') usesText = ` (${state.preRunInventory.itemUses.flashlight}⚡)`;
-                            else if (id === 'skeleton_key') usesText = ` (${state.preRunInventory.itemUses.skeleton_key}🔑)`;
-                            const quantityText = state.preRunInventory.items[id] > 1 ? `x${state.preRunInventory.items[id]}` : '';
-                            dom.preRunItemsList.innerHTML += `<p>${utils.getLangString('item_'+id+'_name')} ${quantityText}${usesText}</p>`;
-                        }
-                    }
-                }
-                if (!hasItems) dom.preRunItemsList.innerHTML = `<p>${utils.getLangString('no_items')}</p>`;
-                const shopFragment = document.createDocumentFragment();
-                for (const id in config.ITEMS) {
-                    const item = config.ITEMS[id];
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'shop-item';
-                    let canBuy = (state.saveData.totalCoins - currentCost) >= item.price;
-                    if (item.unique && state.preRunInventory.items && state.preRunInventory.items[id] > 0) canBuy = false;
-                    if (item.requires && (!state.preRunInventory.items || !state.preRunInventory.items[item.requires])) canBuy = false;
-                    itemEl.innerHTML = `<h3 class="horror-font">${utils.getLangString('item_'+id+'_name')}</h3><p>${utils.getLangString('item_'+id+'_desc')}</p><p class="price">${item.price} 💰</p><button class="screen-button horror-font buy-button" data-item="${id}" ${!canBuy ? 'disabled' : ''}>${utils.getLangString('buy_button')}</button>`;
-                    shopFragment.appendChild(itemEl);
-                }
-                dom.shopItemsGrid.appendChild(shopFragment);
-            },
-            renderAchievements() {
-                const { dom, state, utils } = HotelHorrorGame;
-                dom.achievementsListContainer.innerHTML = '';
-                const achFragment = document.createDocumentFragment();
-                for (const id in HotelHorrorGame.config.ACHIEVEMENTS) {
-                    const isUnlocked = state.saveData.achievements[id];
-                    const achEl = document.createElement('div');
-                    achEl.className = `achievement ${isUnlocked ? 'unlocked' : ''}`;
-                    achEl.innerHTML = `<div class="achievement-icon">${isUnlocked ? '🏆' : '🔒'}</div><div class="achievement-details"><h3 class="horror-font">${utils.getLangString('ach_'+id+'_name')}</h3><p>${utils.getLangString('ach_'+id+'_desc')}</p></div>`;
-                    achFragment.appendChild(achEl);
-                }
-                dom.achievementsListContainer.appendChild(achFragment);
-            },
-            renderHowToPlay() { const { dom, utils } = HotelHorrorGame; dom.howToPlayContent.innerHTML = `<h3 class="horror-font">${utils.getLangString('htp_objective_h')}</h3><p>${utils.getLangString('htp_objective_p')}</p><h3 class="horror-font">${utils.getLangString('htp_entities_h')}</h3><p>${utils.getLangString('htp_entities_p')}</p><h3 class="horror-font">${utils.getLangString('htp_rush_h')}</h3><p>${utils.getLangString('htp_rush_p')}</p><h3 class="horror-font">${utils.getLangString('htp_screech_h')}</h3><p>${utils.getLangString('htp_screech_p')}</p><h3 class="horror-font">${utils.getLangString('htp_items_h')}</h3><p>${utils.getLangString('htp_items_p')}</p>`; },
-            showAchievementPopup(id) {
-                const { dom, utils, audio, persistence, state } = HotelHorrorGame;
-                if (id in state.saveData.achievements && !state.saveData.achievements[id]) {
-                    state.saveData.achievements[id] = true;
-                    persistence.save();
-                    dom.achievementPopup.innerHTML = utils.getLangString('ach_unlocked_popup', utils.getLangString(`ach_${id}_name`));
-                    dom.achievementPopup.style.display = 'block';
-                    dom.achievementPopup.style.animation = 'slideIn 0.5s ease-out';
-                    audio.play('achievement_unlocked');
-                    setTimeout(() => { dom.achievementPopup.style.animation = 'slideOut 0.5s ease-in forwards'; setTimeout(() => dom.achievementPopup.style.display = 'none', 500); }, 3000);
-                }
+                return { totalCoins: 0, highScore: 0, achievements, language: 'tr', foundLore: [] };
             }
         },
         gameplay: {
             start() {
                 this.resetRunState();
-                const { state } = HotelHorrorGame;
+                const { state, ui } = HotelHorrorGame;
                 state.gameState.items = JSON.parse(JSON.stringify(state.preRunInventory.items || {}));
                 state.gameState.itemUses = JSON.parse(JSON.stringify(state.preRunInventory.itemUses || { flashlight: 0, skeleton_key: 0 }));
                 state.preRunInventory = {};
                 state.gameState.gameActive = true;
-                HotelHorrorGame.ui.showScreen(null);
+                ui.showScreen(null);
                 HotelHorrorGame.dom.gameContainer.style.display = 'flex';
                 state.gameState.currentDoor = 1; 
+                state.gameState.nextRoomHint = this.predictNextRoom(); // Predict first room
                 this.generateRoom();
             },
             async end(reasonKey, titleKey = "game_over", isVictory = false) {
@@ -515,30 +703,53 @@
                 state.gameState.gameActive = false; state.gameState.playerCanInteract = false;
                 if (state.eventAbortController) state.eventAbortController.abort();
                 audio.stopAll();
-                dom.gameContainer.classList.remove('rush-warning');
-                const passedDoors = isVictory ? state.gameState.currentDoor -1 : state.gameState.currentDoor - 1;
-                if (passedDoors < 0) passedDoors = 0; // cannot be negative
+                dom.gameContainer.className = 'game-container';
+                dom.itemTimersContainer.innerHTML = '';
+                let passedDoors = isVictory ? state.gameState.currentDoor -1 : state.gameState.currentDoor - 1;
+                if (passedDoors < 0) passedDoors = 0;
+                
                 if (reasonKey) {
                     const reason = utils.getLangString(reasonKey);
                     if (reason.includes("Rush") || reason.includes("Ambush")) ui.showAchievementPopup('death_by_rush');
                     else if (reason.includes("Screech")) ui.showAchievementPopup('death_by_screech');
+                    else if (reason.includes("Hush")) ui.showAchievementPopup('death_by_hush');
+                    else if (reason.includes("Taklitçi") || reason.includes("Mimic")) ui.showAchievementPopup('death_by_mimic');
                 }
+                
                 const baseCoins = state.gameState.runCoins;
                 const hasCharm = 'lucky_charm' in state.gameState.items && state.gameState.items.lucky_charm > 0;
                 let finalCoins = hasCharm ? Math.ceil(baseCoins * 1.5) : baseCoins;
                 if (passedDoors > state.saveData.highScore) { state.saveData.highScore = passedDoors; }
                 state.saveData.totalCoins += finalCoins;
+                
+                state.gameState.foundLoreThisRun.forEach(page => {
+                    if (!state.saveData.foundLore.includes(page)) { state.saveData.foundLore.push(page); }
+                });
+                if(state.saveData.foundLore.length === HotelHorrorGame.config.LORE_PAGES) ui.showAchievementPopup('master_historian');
+
                 persistence.save();
+                
                 if (reasonKey && !isVictory) {
                     audio.play('jumpscare_sound');
                     dom.jumpscareImage.style.animation = 'none'; void dom.jumpscareImage.offsetWidth;
                     dom.jumpscareImage.style.animation = 'jumpscare-intense 0.25s';
                     dom.jumpscareOverlay.style.display = 'flex';
                 } else if (isVictory) { audio.play('victory'); } else { audio.play('game_over'); }
+                
                 dom.gameOverTitle.textContent = utils.getLangString(titleKey);
                 dom.gameOverReason.textContent = reasonKey ? utils.getLangString(reasonKey) : "";
                 if (hasCharm && baseCoins > 0) { dom.runSummaryEl.innerHTML = utils.getLangString('run_summary_text', passedDoors, finalCoins, baseCoins); } 
                 else { dom.runSummaryEl.innerHTML = utils.getLangString('run_summary_text_no_charm', passedDoors, finalCoins); }
+                
+                const stats = state.gameState.runStats;
+                let statsHtml = `<h3 class="horror-font">${utils.getLangString('run_stats_title')}</h3>`;
+                const encounters = Object.entries(stats.encounters).map(([k,v]) => `${k}: ${v}`).join(', ');
+                if(encounters) statsHtml += `<p><strong>${utils.getLangString('stat_encounters')}:</strong> ${encounters}</p>`;
+                const itemsUsed = Object.entries(stats.itemsUsed).map(([k,v]) => `${utils.getLangString('item_'+k+'_name')}: ${v}`).join(', ');
+                if(itemsUsed) statsHtml += `<p><strong>${utils.getLangString('stat_items_used')}:</strong> ${itemsUsed}</p>`;
+                if(state.gameState.foundLoreThisRun.length > 0) statsHtml += `<p><strong>${utils.getLangString('stat_lore_found')}:</strong> ${state.gameState.foundLoreThisRun.length}</p>`;
+                dom.runStatsEl.innerHTML = statsHtml;
+
                 await utils.sleep(isVictory ? 2500 : 1500);
                 dom.jumpscareOverlay.style.display = 'none';
                 dom.gameContainer.style.animation = 'fadeOut 1s forwards';
@@ -550,7 +761,14 @@
             resetRunState() {
                 const { state } = HotelHorrorGame;
                 if (state.eventAbortController) { state.eventAbortController.abort(); }
-                state.gameState = { currentDoor: 0, gameActive: false, isHiding: false, playerCanInteract: true, hasKey: false, screechActive: false, runCoins: 0, items: {}, itemUses: { flashlight: 0, skeleton_key: 0 } };
+                state.gameState = { 
+                    currentDoor: 0, gameActive: false, isHiding: false, playerCanInteract: true, 
+                    hasKey: false, screechActive: false, runCoins: 0,
+                    items: {}, itemUses: { flashlight: 0, skeleton_key: 0 },
+                    noiseLevel: 0, musicBoxActive: false, hushFails: 0,
+                    foundLoreThisRun: [], nextRoomHint: null,
+                    runStats: { encounters: {}, itemsUsed: {} }
+                };
                 for (const id in HotelHorrorGame.config.ITEMS) { state.gameState.items[id] = 0; }
                 state.currentEvent = null;
             },
@@ -560,132 +778,180 @@
                 state.gameState.isHiding = false; state.gameState.hasKey = false; state.gameState.screechActive = false;
                 state.currentEvent = null; state.eventAbortController = new AbortController();
                 state.gameState.playerCanInteract = true; ui.hideCentralMessage();
+                dom.itemTimersContainer.innerHTML = '';
                 
                 if (state.gameState.currentDoor > HotelHorrorGame.config.GOAL_DOOR) { ui.showAchievementPopup('hundred_doors'); this.end(null, "victory", true); return; }
-                if (state.gameState.currentDoor === 1 && !state.saveData.achievements.first_step) ui.showAchievementPopup('first_step');
-                if (state.gameState.currentDoor === 10 && !state.saveData.achievements.ten_doors) ui.showAchievementPopup('ten_doors');
-                if (state.gameState.currentDoor === 50 && !state.saveData.achievements.fifty_doors) ui.showAchievementPopup('fifty_doors');
+                if (state.gameState.currentDoor === 1) ui.showAchievementPopup('first_step');
+                if (state.gameState.currentDoor === 10) ui.showAchievementPopup('ten_doors');
+                if (state.gameState.currentDoor === 50) ui.showAchievementPopup('fifty_doors');
                 
-                const doorProgress = Math.min((state.gameState.currentDoor - 1) / (HotelHorrorGame.config.GOAL_DOOR - 1), 1);
+                const doorProgress = (state.gameState.currentDoor - 1) / (HotelHorrorGame.config.GOAL_DOOR - 1);
                 
-                let roomConfig = { isLocked: false, searchableCount: 0, event: null, floorCoins: 0, keyLocation: null };
-                const roll = Math.random();
+                let roomConfig = { isLocked: false, searchableCount: 0, event: state.gameState.nextRoomHint, floorLoot: 0, keyLocation: null, isMimic: false, roomType: 'normal' };
+                
+                if (roomConfig.event === 'safe') roomConfig.event = null;
+                if (roomConfig.event === 'guiding_light') { roomConfig.isMimic = false; }
 
-                if (state.gameState.currentDoor > 20 && Math.random() < 0.03) {
+                if (state.gameState.currentDoor > 20 && Math.random() < 0.03) { // Treasure room
                     roomConfig.searchableCount = 3 + Math.floor(Math.random() * 3);
-                    roomConfig.floorCoins = 5 + Math.floor(Math.random() * 6);
+                    roomConfig.floorLoot = 5 + Math.floor(Math.random() * 6);
                     ui.showCentralMessage(utils.getLangString('msg_treasure_room'), 2500, 'safe');
                 } else {
-                    if (Math.random() < 0.25 + doorProgress * 0.25) {
-                        roomConfig.isLocked = true;
-                        roomConfig.keyLocation = 'floor'; 
-                        roomConfig.searchableCount = Math.max(roomConfig.searchableCount, 1);
-                    }
-
-                    if (roll < 0.35 + doorProgress * 0.3 && state.gameState.currentDoor > 3) {
-                        roomConfig.event = 'rush';
-                    } else if (roll < 0.75 + doorProgress * 0.25 && state.gameState.currentDoor >= 10) {
-                        roomConfig.event = 'screech';
-                    }
-                    
-                    if (Math.random() < 0.05 && state.gameState.currentDoor > 5) roomConfig.event = 'guiding_light';
+                    if (Math.random() < 0.25 + doorProgress * 0.25) { roomConfig.isLocked = true; roomConfig.keyLocation = 'floor'; roomConfig.searchableCount = Math.max(roomConfig.searchableCount, 1); }
+                    if (Math.random() < 0.05) roomConfig.roomType = 'flooded';
                     if (Math.random() < 0.6) roomConfig.searchableCount = Math.max(roomConfig.searchableCount, Math.floor(Math.random() * 3) + 1);
-                    if (Math.random() < 0.3) roomConfig.floorCoins = Math.floor(Math.random() * 3) + 1;
+                    if (Math.random() < 0.3) roomConfig.floorLoot = Math.floor(Math.random() * 4); // Coins or items
+                    if (roomConfig.event === 'mimic') { roomConfig.isMimic = true; roomConfig.event = null; }
                 }
                 
+                if (roomConfig.roomType === 'flooded') dom.gameContainer.classList.add('flooded-room');
+
                 this.createRoomLayout(roomConfig);
+                state.gameState.nextRoomHint = this.predictNextRoom();
                 ui.updateGameUI();
                 state.currentEvent = roomConfig.event;
-                if (events[roomConfig.event]) { events[roomConfig.event](); }
+                if (events[roomConfig.event]) { 
+                    state.gameState.runStats.encounters[roomConfig.event] = (state.gameState.runStats.encounters[roomConfig.event] || 0) + 1;
+                    events[roomConfig.event](); 
+                }
             },
             createRoomLayout(config) {
-                const { dom, state, ui, audio, utils } = HotelHorrorGame;
+                const { dom, state, ui, audio, utils, config: gameConfig } = HotelHorrorGame;
                 const roomFragment = document.createDocumentFragment();
 
-                // *** KESİN ÇÖZÜM V2: DOLAP İÇİN SABİT VE GARANTİLİ KONUM ***
-                const fixedHidingSpotLocation = '2 / 1'; // Dolap her zaman sol ortada olacak.
-                // Dolabın konumu hariç, diğer nesnelerin yerleşebileceği tüm boş konumlar.
                 let availableSlots = ['1 / 1', '3 / 1', '1 / 2', '3 / 2', '1 / 4', '3 / 4', '1 / 5', '2 / 5', '3 / 5'].sort(() => Math.random() - 0.5);
                 
-                // Kapıyı oluştur
-                const door = document.createElement('div');
-                door.className = 'door interactive';
-                door.style.gridArea = '1 / 3 / span 2 / span 1'; // Kapı her zaman ortada.
-                if (config.isLocked) door.classList.add('locked');
-                door.innerHTML = `<span class="door-number horror-font">${String(state.gameState.currentDoor).padStart(3, '0')}</span><div class="door-knob"></div>`;
-                door.addEventListener('click', () => this.onDoorClick(door));
+                let mimicType = null;
+                if (config.isMimic) {
+                    const choices = ['door', 'hidingSpot', 'searchable'];
+                    mimicType = choices[Math.floor(Math.random() * choices.length)];
+                    if (mimicType === 'searchable' && config.searchableCount === 0) { mimicType = 'door'; }
+                }
+
+                // Door
+                const isDoorMimic = mimicType === 'door';
+                const door = this.createInteractiveElement('div', 'door', isDoorMimic, '1 / 3 / span 2 / span 1');
+                if (config.isLocked && !isDoorMimic) door.classList.add('locked');
+                const doorNumber = document.createElement('span');
+                doorNumber.className = `door-number horror-font ${isDoorMimic ? 'mimic-cue' : ''}`;
+                doorNumber.textContent = String(state.gameState.currentDoor).padStart(3, '0');
+                door.innerHTML = `<div class="door-knob"></div>`;
+                door.prepend(doorNumber);
+                door.addEventListener('click', () => isDoorMimic ? this.end("reason_mimic", "caught") : this.onDoorClick(door));
                 roomFragment.appendChild(door);
 
-                // Dolabı oluştur ve SABİT konumuna yerleştir
-                const hidingSpot = document.createElement('div');
-                hidingSpot.className = 'hiding-spot interactive';
-                hidingSpot.style.gridArea = fixedHidingSpotLocation;
+                // Hiding Spot
+                const isHidingSpotMimic = mimicType === 'hidingSpot';
+                const hidingSpot = this.createInteractiveElement('div', 'hiding-spot', isHidingSpotMimic, '2 / 1');
                 hidingSpot.addEventListener('click', () => {
-                    const isRushEvent = state.currentEvent === 'rush' || state.currentEvent === 'ambush';
-                    if (!isRushEvent) { 
-                        ui.showCentralMessage(utils.getLangString('msg_no_hide'), 1000, 'safe'); 
-                        return; 
-                    }
-                    if (!state.gameState.isHiding) { 
-                        state.gameState.isHiding = true; 
-                        hidingSpot.classList.add('hiding'); 
-                        ui.showCentralMessage(utils.getLangString('msg_hiding'), 0, 'safe'); 
-                    }
+                    if (isHidingSpotMimic) { this.end("reason_mimic", "caught"); return; }
+                    if (!['rush', 'ambush'].includes(state.currentEvent)) { ui.showCentralMessage(utils.getLangString('msg_no_hide'), 1000, 'safe'); return; }
+                    if (!state.gameState.isHiding) { state.gameState.isHiding = true; hidingSpot.classList.add('hiding'); ui.showCentralMessage(utils.getLangString('msg_hiding'), 0, 'safe'); }
                 });
                 roomFragment.appendChild(hidingSpot);
 
-                // Aranabilir nesneleri KALAN rastgele konumlara yerleştir
+                // Searchables
+                let mimicPlaced = false;
                 for (let i = 0; i < config.searchableCount; i++) {
                     if (availableSlots.length > 0) { 
-                        const searchable = document.createElement('div');
-                        searchable.className = 'searchable interactive';
-                        searchable.style.gridArea = availableSlots.shift(); // Kalan boş konumlardan birini kullan
+                        const isThisSearchableMimic = mimicType === 'searchable' && !mimicPlaced;
+                        const searchable = this.createInteractiveElement('div', 'searchable', isThisSearchableMimic, availableSlots.shift());
+                        mimicPlaced = isThisSearchableMimic || mimicPlaced;
                         searchable.addEventListener('click', (e) => {
-                            audio.play('coin_sound'); const foundCoins = 5 + Math.floor(Math.random() * 11);
-                            state.gameState.runCoins += foundCoins;
-                            if (state.gameState.runCoins >= 100 && !state.saveData.achievements.rich_boy) { ui.showAchievementPopup('rich_boy'); }
-                            ui.updateGameUI(); 
+                            if(isThisSearchableMimic) { this.end("reason_mimic", "caught"); return; }
+                            this.makeNoise(15); audio.play('coin_sound');
+                            this.searchObject();
                             e.currentTarget.classList.add('searched');
                         }, { once: true });
                         roomFragment.appendChild(searchable);
                     }
                 }
                 
-                const placeOnFloor = (element) => {
-                    element.style.left = `${15 + Math.random() * 70}%`;
-                    element.style.top = `${20 + Math.random() * 60}%`;
-                    roomFragment.appendChild(element);
-                };
-                
-                const placeKeyNearDoor = (element) => {
-                    element.style.left = `${40 + Math.random() * 20}%`; 
-                    element.style.top = `${45 + Math.random() * 10}%`; 
-                    roomFragment.appendChild(element);
-                };
+                // Floor Loot
+                for (let i = 0; i < config.floorLoot; i++) {
+                    if (Math.random() < 0.2) { // 20% chance for floor loot to be an item
+                        const lootableItems = Object.keys(gameConfig.ITEMS).filter(id => gameConfig.ITEMS[id].lootable && Math.random() < gameConfig.ITEMS[id].lootChance * 5); // Higher chance for floor items
+                        if(lootableItems.length > 0) {
+                            const itemId = lootableItems[Math.floor(Math.random() * lootableItems.length)];
+                            const itemEl = document.createElement('span');
+                            itemEl.className = 'floor-item interactive';
+                            itemEl.textContent = gameConfig.ITEMS[itemId].icon;
+                            itemEl.addEventListener('click', e => {
+                                e.stopPropagation(); this.makeNoise(5); audio.play('key_found');
+                                this.givePlayerItem(itemId);
+                                itemEl.remove();
+                            }, { once: true });
+                            this.placeOnFloor(itemEl, roomFragment);
+                            continue;
+                        }
+                    }
+                    // Default to coin
+                    const coinEl = document.createElement('span');
+                    coinEl.className = 'floor-coin interactive'; coinEl.textContent = '💰';
+                    coinEl.addEventListener('click', (e) => {
+                        e.stopPropagation(); this.makeNoise(10); audio.play('coin_sound'); state.gameState.runCoins += 10;
+                        ui.updateGameUI(); e.currentTarget.remove();
+                    }, { once: true });
+                    this.placeOnFloor(coinEl, roomFragment);
+                }
 
                 if (config.keyLocation === 'floor') {
                     const keyEl = document.createElement('div');
                     keyEl.className = 'floor-key interactive'; keyEl.textContent = '🔑';
                     keyEl.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        audio.play('key_found'); state.gameState.hasKey = true; ui.showAchievementPopup('locksmith');
+                        e.stopPropagation(); this.makeNoise(5); audio.play('key_found'); state.gameState.hasKey = true; ui.showAchievementPopup('locksmith');
                         dom.roomEl.querySelector('.door.locked')?.classList.remove('locked');
                         ui.updateGameUI(); e.currentTarget.remove();
                     }, { once: true });
-                    placeKeyNearDoor(keyEl);
-                }
-
-                for (let i = 0; i < config.floorCoins; i++) {
-                    const coinEl = document.createElement('span');
-                    coinEl.className = 'floor-coin interactive'; coinEl.textContent = '💰';
-                    coinEl.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        audio.play('coin_sound'); state.gameState.runCoins += 10;
-                        ui.updateGameUI(); e.currentTarget.remove();
-                    }, { once: true });
-                    placeOnFloor(coinEl);
+                    this.placeKeyNearDoor(keyEl, roomFragment);
                 }
                 dom.roomEl.appendChild(roomFragment);
+            },
+            createInteractiveElement(tag, baseClass, isMimic, gridArea) {
+                const el = document.createElement(tag);
+                el.className = `${baseClass} interactive ${isMimic ? 'mimic-cue' : ''}`;
+                el.style.gridArea = gridArea;
+                return el;
+            },
+            placeOnFloor(element, fragment) { element.style.left = `${15 + Math.random() * 70}%`; element.style.top = `${20 + Math.random() * 60}%`; fragment.appendChild(element); },
+            placeKeyNearDoor(element, fragment) { element.style.left = `${40 + Math.random() * 20}%`; element.style.top = `${45 + Math.random() * 10}%`; fragment.appendChild(element); },
+            searchObject() {
+                const { state, ui, utils, config } = HotelHorrorGame;
+                const roll = Math.random();
+                
+                if(roll < 0.25) { // 25% chance to find an item
+                    const lootableItems = Object.keys(config.ITEMS).filter(id => config.ITEMS[id].lootable && Math.random() < config.ITEMS[id].lootChance);
+                    if(lootableItems.length > 0) {
+                        const itemId = lootableItems[Math.floor(Math.random() * lootableItems.length)];
+                        this.givePlayerItem(itemId);
+                        return;
+                    }
+                }
+                if(roll < 0.35 && state.saveData.foundLore.length < config.LORE_PAGES) { // 10% chance for lore page
+                    const unFoundPages = Array.from({length: config.LORE_PAGES}, (_, i) => i + 1).filter(p => !state.saveData.foundLore.includes(p));
+                    if(unFoundPages.length > 0) {
+                        const foundPage = unFoundPages[Math.floor(Math.random() * unFoundPages.length)];
+                        state.gameState.foundLoreThisRun.push(foundPage);
+                        ui.showCentralMessage(utils.getLangString('lore_page_found'), 2500, 'safe');
+                        HotelHorrorGame.audio.play('page_found');
+                        return;
+                    }
+                }
+                // Default to coins
+                const foundCoins = 5 + Math.floor(Math.random() * 11);
+                state.gameState.runCoins += foundCoins;
+                if (state.gameState.runCoins >= 100) ui.showAchievementPopup('rich_boy');
+                ui.updateGameUI();
+            },
+            givePlayerItem(itemId) {
+                const { state, ui, utils } = HotelHorrorGame;
+                if(itemId === 'battery' && state.gameState.items.flashlight > 0) {
+                    state.gameState.itemUses.flashlight = (state.gameState.itemUses.flashlight || 0) + 10;
+                } else {
+                    state.gameState.items[itemId] = (state.gameState.items[itemId] || 0) + 1;
+                }
+                ui.showCentralMessage(utils.getLangString('msg_item_found', utils.getLangString(`item_${itemId}_name`)), 1500, 'safe');
+                ui.updateGameUI();
             },
             onDoorClick(doorElement) {
                 const { state, ui, gameplay, utils } = HotelHorrorGame;
@@ -697,10 +963,12 @@
                 if (doorElement.classList.contains('locked') && !state.gameState.hasKey) {
                     if (state.gameState.items.skeleton_key > 0 && state.gameState.itemUses.skeleton_key > 0) {
                         state.gameState.itemUses.skeleton_key--;
+                        this.useItem('skeleton_key');
                         if (state.gameState.itemUses.skeleton_key === 0) state.gameState.items.skeleton_key = 0;
                         ui.showAchievementPopup('master_of_unlocking'); ui.showCentralMessage(utils.getLangString('msg_skeleton_key_used'), 1000, 'safe'); canOpen = true;
                     } else if (state.gameState.items.lockpick > 0) {
-                        state.gameState.items.lockpick--; ui.showAchievementPopup('master_of_unlocking'); ui.showCentralMessage(utils.getLangString('msg_lockpick_used'), 1000, 'safe'); canOpen = true;
+                        state.gameState.items.lockpick--; this.useItem('lockpick');
+                        ui.showAchievementPopup('master_of_unlocking'); ui.showCentralMessage(utils.getLangString('msg_lockpick_used'), 1000, 'safe'); canOpen = true;
                     } else { ui.showCentralMessage(utils.getLangString('msg_locked_door'), 1500, 'danger'); }
                 }
 
@@ -714,11 +982,12 @@
                 const { state, dom, audio, utils } = HotelHorrorGame;
                 state.gameState.playerCanInteract = false;
                 if (state.eventAbortController) state.eventAbortController.abort();
-                audio.play('door_open');
+                audio.play('door_open'); this.makeNoise(25);
                 state.gameState.currentDoor++;
                 dom.gameContainer.style.animation = 'fadeOut 0.3s forwards';
                 await utils.sleep(300);
                 dom.gameContainer.style.animation = 'fadeIn 0.3s';
+                state.gameState.noiseLevel = Math.floor(state.gameState.noiseLevel * 0.75); // Noise decays by 25%
                 this.generateRoom();
             },
             calculatePreRunCost() {
@@ -736,39 +1005,81 @@
                 }
                 return totalCost;
             },
-            tryUseCrucifix() {
+            tryUseCrucifix(entityType) {
                 const { state, ui, utils, dom } = HotelHorrorGame;
                 if (state.gameState.items.crucifix > 0) {
-                    state.gameState.items.crucifix--; ui.updateGameUI();
-                    ui.showCentralMessage(utils.getLangString('msg_crucifix_used'), 2000, 'safe');
-                    if (state.eventAbortController) state.eventAbortController.abort();
-                    setTimeout(() => {
-                        dom.gameContainer.classList.remove('rush-warning');
-                        dom.roomEl.classList.remove('flickering');
-                        if(state.gameState.gameActive) { state.currentEvent = null; }
-                    }, 500);
-                    return true;
+                    state.gameState.items.crucifix--; this.useItem('crucifix');
+                    ui.updateGameUI();
+                    
+                    let success = true;
+                    if (entityType === 'ambush' || entityType === 'hush') {
+                        if (Math.random() > 0.7) success = false; // 30% chance to fail
+                    }
+
+                    if(success) {
+                        ui.showCentralMessage(utils.getLangString('msg_crucifix_used'), 2000, 'safe');
+                        if (state.eventAbortController) state.eventAbortController.abort();
+                        setTimeout(() => {
+                            dom.gameContainer.className = 'game-container';
+                            dom.roomEl.classList.remove('flickering');
+                            if(state.gameState.gameActive) { state.currentEvent = null; }
+                        }, 500);
+                        return true;
+                    } else {
+                        ui.showCentralMessage(utils.getLangString('reason_crucifix_failed'), 2000, 'danger');
+                        return false; // Crucifix was used but failed
+                    }
                 }
-                return false;
+                return false; // No crucifix to use
+            },
+            makeNoise(amount) {
+                const { state, dom, events, ui, utils } = HotelHorrorGame;
+                if(dom.gameContainer.classList.contains('flooded-room')) amount *= 1.5;
+                state.gameState.noiseLevel += amount;
+                if (state.gameState.noiseLevel >= 100 && !state.currentEvent) {
+                    state.currentEvent = 'hush'; events.hush();
+                    ui.showCentralMessage(utils.getLangString('msg_hush_warning'), 1500, 'danger');
+                }
+                ui.updateGameUI();
+            },
+            useItem(itemId) {
+                const { state } = HotelHorrorGame;
+                state.gameState.runStats.itemsUsed[itemId] = (state.gameState.runStats.itemsUsed[itemId] || 0) + 1;
+            },
+            predictNextRoom() {
+                const { state } = HotelHorrorGame;
+                const doorProgress = (state.gameState.currentDoor) / (HotelHorrorGame.config.GOAL_DOOR - 1);
+                const roll = Math.random();
+
+                if (state.gameState.currentDoor > 5 && roll < 0.25 + doorProgress * 0.3) {
+                    return state.gameState.currentDoor > 30 && Math.random() < 0.3 ? 'ambush' : 'rush';
+                }
+                if (state.gameState.currentDoor >= 10 && roll < 0.50 + doorProgress * 0.25) return 'screech';
+                if (state.gameState.currentDoor >= 15 && roll < 0.65 + doorProgress * 0.2) return 'eyes';
+                if (state.gameState.currentDoor >= 20 && Math.random() < (0.05 + doorProgress * 0.05)) return 'mimic';
+                if (Math.random() < 0.05 && state.gameState.currentDoor > 5) return 'guiding_light';
+                
+                return 'safe';
             }
         },
         events: {
             guiding_light() { const { dom, ui, utils } = HotelHorrorGame; dom.gameContainer.classList.add('light-room-special'); ui.showCentralMessage(utils.getLangString('msg_guiding_light'), 2000, 'safe'); ui.showAchievementPopup('guiding_light'); },
             async rush() {
                 const { dom, state, ui, audio, utils, gameplay } = HotelHorrorGame;
+                const isAmbush = state.currentEvent === 'ambush';
                 const signal = state.eventAbortController.signal;
                 state.gameState.playerCanInteract = false;
 
                 try {
                     await utils.sleep(1000, signal);
+                    if (state.gameState.musicBoxActive) await utils.sleep(3000, signal); // Music box delays
+                    
                     ui.showCentralMessage(utils.getLangString('msg_rush_approaches'), 3500, 'danger');
-                    dom.gameContainer.classList.add('rush-warning');
+                    dom.gameContainer.classList.add(isAmbush ? 'ambush-warning' : 'rush-warning');
                     
                     await utils.sleep(2500, signal);
-                    if (gameplay.tryUseCrucifix()) { state.gameState.playerCanInteract = true; return; }
-
-                    const isAmbush = Math.random() < 0.3 && state.gameState.currentDoor > 25;
-                    if(isAmbush) state.currentEvent = 'ambush';
+                    if (gameplay.tryUseCrucifix(isAmbush ? 'ambush' : 'rush')) { state.gameState.playerCanInteract = true; return; }
+                    if (state.gameState.adrenalineUsed) { state.gameState.playerCanInteract = true; return; }
                     
                     const totalPasses = isAmbush ? 2 + Math.floor(Math.random() * 3) : 1;
                     for (let pass = 0; pass < totalPasses; pass++) {
@@ -781,19 +1092,19 @@
                     }
                     ui.showAchievementPopup('close_call');
                     ui.showCentralMessage(utils.getLangString('msg_danger_passed'), 2000, 'safe');
-                } catch (error) { 
-                    if (error.name !== 'AbortError') console.error("Rush event error:", error);
+                } catch (error) { if (error.name !== 'AbortError') console.error("Rush/Ambush event error:", error);
                 } finally {
                     state.gameState.playerCanInteract = true;
-                    dom.gameContainer.classList.remove('rush-warning');
+                    dom.gameContainer.classList.remove('rush-warning', 'ambush-warning');
                     if(state.gameState.gameActive) { 
                         dom.roomEl.querySelector('.hiding-spot')?.classList.remove('hiding'); 
                         state.gameState.isHiding = false; 
-                        state.currentEvent = null; 
+                        state.currentEvent = null; state.gameState.adrenalineUsed = false;
                         ui.hideCentralMessage();
                     }
                 }
             },
+            async ambush() { this.rush(); }, // Ambush is a variant of Rush
             async screech() {
                 const { dom, state, ui, audio, utils, gameplay } = HotelHorrorGame;
                 const signal = state.eventAbortController.signal; let screechTarget; let found = false;
@@ -801,19 +1112,20 @@
 
                 try {
                     await utils.sleep(1000, signal);
-                    if (gameplay.tryUseCrucifix()) { state.gameState.playerCanInteract = true; return; }
+                    if (state.gameState.musicBoxActive) { if(state.eventAbortController) state.eventAbortController.abort(); return; }
+                    if (gameplay.tryUseCrucifix('screech')) { state.gameState.playerCanInteract = true; return; }
 
                     let roomClarity = 'dark-room'; let timeToFind = 3500; let screechVisible = false;
                     if (state.gameState.items.flashlight > 0 && state.gameState.itemUses.flashlight > 0) {
                         roomClarity = 'light-room-special'; timeToFind = 6000; screechVisible = true;
-                        state.gameState.itemUses.flashlight--; if (state.gameState.itemUses.flashlight <= 0) state.gameState.items.flashlight = 0;
-                    } else if (state.gameState.items.lighter > 0) { roomClarity = 'dim-room'; timeToFind = 5000; screechVisible = true; }
+                        state.gameState.itemUses.flashlight--; gameplay.useItem('flashlight');
+                        if (state.gameState.itemUses.flashlight <= 0) state.gameState.items.flashlight = 0;
+                    } else if (state.gameState.items.lighter > 0) { roomClarity = 'dim-room'; timeToFind = 5000; screechVisible = true; gameplay.useItem('lighter');}
                     
-                    dom.gameContainer.classList.add(roomClarity); 
+                    dom.gameContainer.classList.add(roomClarity, 'screech-cue'); 
                     audio.play('screech_psst', false, 0.7);
                     ui.showCentralMessage(utils.getLangString('msg_screech_psst'), 2000, 'danger');
                     state.gameState.screechActive = true; 
-                    ui.updateGameUI();
 
                     await utils.sleep(500, signal);
                     
@@ -821,29 +1133,113 @@
                     screechTarget.className = `screech-target interactive ${screechVisible ? 'visible' : ''}`;
                     screechTarget.style.top = `${10 + Math.random() * 80}%`; screechTarget.style.left = `${10 + Math.random() * 80}%`;
                     
-                    const onFound = (e) => { 
+                    screechTarget.addEventListener('click', (e) => { 
                         if(found) return;
-                        e.stopPropagation();
-                        found = true; 
+                        e.stopPropagation(); found = true; 
                         ui.showAchievementPopup('look_at_me'); 
                         ui.showCentralMessage(utils.getLangString('msg_screech_scared'), 1500, 'safe'); 
                         if(state.eventAbortController) state.eventAbortController.abort(); 
-                    };
-                    screechTarget.addEventListener('click', onFound, { once: true });
+                    }, { once: true });
                     dom.roomEl.appendChild(screechTarget);
                     
                     await utils.sleep(timeToFind, signal);
                     if (!found) { gameplay.end("reason_screech_timeout", "caught"); }
-                } catch (error) { 
-                    if (error.name !== 'AbortError') console.error("Screech event error:", error);
+                } catch (error) { if (error.name !== 'AbortError') console.error("Screech event error:", error);
                 } finally {
                     state.gameState.playerCanInteract = true;
                     if(state.gameState.gameActive) { 
-                        dom.gameContainer.className = 'game-container'; 
+                        dom.gameContainer.className = dom.gameContainer.className.replace(/\bdark-room\b|\bdim-room\b|\bscreech-cue\b/g, ''); 
                         screechTarget?.remove(); 
-                        state.gameState.screechActive = false; 
-                        state.currentEvent = null; 
-                        ui.updateGameUI(); 
+                        state.gameState.screechActive = false; state.currentEvent = null; ui.updateGameUI(); 
+                    }
+                }
+            },
+            async hush() {
+                const { dom, state, ui, audio, utils, gameplay } = HotelHorrorGame;
+                const signal = state.eventAbortController.signal;
+                state.gameState.playerCanInteract = false;
+                
+                const moveListener = () => { if (state.currentEvent === 'hush') gameplay.end("reason_hush", "caught"); };
+                
+                try {
+                    if (gameplay.tryUseCrucifix('hush')) { state.gameState.playerCanInteract = true; state.gameState.noiseLevel = 0; return; }
+                    audio.stopAll();
+                    dom.gameContainer.classList.add('hush-active');
+                    ui.showCentralMessage(utils.getLangString('msg_hush_active'), 5000, 'hush');
+                    
+                    await utils.sleep(500, signal); // grace period
+                    document.body.addEventListener('mousemove', moveListener);
+                    
+                    await utils.sleep(4500, signal);
+                    
+                    state.gameState.hushFails = (state.gameState.hushFails || 0) + 1;
+                    if(state.gameState.hushFails >= 5) ui.showAchievementPopup('silent_survivor');
+                    ui.showCentralMessage(utils.getLangString('msg_hush_safe'), 1500, 'safe');
+                    
+                } catch (error) { if (error.name !== 'AbortError') console.error("Hush event error:", error);
+                } finally {
+                    document.body.removeEventListener('mousemove', moveListener);
+                    if (state.gameState.gameActive) {
+                        state.gameState.playerCanInteract = true;
+                        dom.gameContainer.classList.remove('hush-active');
+                        state.gameState.noiseLevel = 0;
+                        state.currentEvent = null;
+                        ui.updateGameUI();
+                    }
+                }
+            },
+            async eyes() {
+                const { dom, state, ui, audio, utils, gameplay } = HotelHorrorGame;
+                const signal = state.eventAbortController.signal;
+                let gazeLevel = 0; let hasTakenDamage = false;
+
+                try {
+                    if (state.gameState.musicBoxActive) { if(state.eventAbortController) state.eventAbortController.abort(); return; }
+                    if (gameplay.tryUseCrucifix('eyes')) return;
+
+                    ui.showCentralMessage(utils.getLangString('msg_eyes_room'), 2500, 'danger');
+                    const eyes = Array.from({ length: 15 + Math.floor(Math.random() * 10) }, () => {
+                        const eye = document.createElement('div');
+                        eye.className = 'eye-entity';
+                        eye.style.top = `${5 + Math.random() * 90}%`;
+                        eye.style.left = `${5 + Math.random() * 90}%`;
+                        dom.roomEl.appendChild(eye);
+                        return eye;
+                    });
+
+                    const gazeInterval = setInterval(() => {
+                        gazeLevel = Math.max(0, gazeLevel - 2); // Gaze decays
+                        if(gazeLevel > 100 && !hasTakenDamage) {
+                            hasTakenDamage = true;
+                            dom.roomEl.classList.add('shaking'); audio.play('jumpscare_sound');
+                            setTimeout(() => dom.roomEl.classList.remove('shaking'), 500);
+                        }
+                    }, 100);
+
+                    const moveListener = (e) => {
+                        const playerX = e.clientX; const playerY = e.clientY;
+                        eyes.forEach(eye => {
+                            const rect = eye.getBoundingClientRect();
+                            const eyeX = rect.left + rect.width / 2;
+                            const eyeY = rect.top + rect.height / 2;
+                            const angle = Math.atan2(playerY - eyeY, playerX - eyeX);
+                            eye.style.transform = `rotate(${angle}rad) scaleX(1.5)`;
+                            const distance = Math.sqrt(Math.pow(playerX - eyeX, 2) + Math.pow(playerY - eyeY, 2));
+                            if(distance < 100) gazeLevel += 0.5;
+                        });
+                    };
+                    document.body.addEventListener('mousemove', moveListener);
+
+                    await new Promise(resolve => signal.addEventListener('abort', resolve));
+                    clearInterval(gazeInterval);
+                    document.body.removeEventListener('mousemove', moveListener);
+                    if(!hasTakenDamage) ui.showAchievementPopup('watchful_eye');
+
+                } catch(error) { if (error.name !== 'AbortError') console.error("Eyes event error:", error);
+                } finally {
+                    if(state.gameState.gameActive) {
+                        state.currentEvent = null;
+                        dom.roomEl.querySelectorAll('.eye-entity').forEach(e => e.remove());
                     }
                 }
             }
@@ -856,14 +1252,17 @@
                 achievementPopup: document.getElementById('achievement-popup'), highScoreDisplay: document.getElementById('high-score-display'), totalCoinsDisplay: document.getElementById('total-coins-display'),
                 shopCoinsDisplay: document.getElementById('shop-coins-display'), shopItemsGrid: document.getElementById('shop-items-grid'), preRunItemsList: document.getElementById('pre-run-items-list'),
                 achievementsListContainer: document.getElementById('achievements-list'), howToPlayContent: document.getElementById('how-to-play-content'),
-                runSummaryEl: document.getElementById('run-summary'), gameOverTitle: document.getElementById('game-over-title'), gameOverReason: document.getElementById('game-over-reason'),
-                screens: { 'main-menu': document.getElementById('main-menu'), 'shop-screen': document.getElementById('shop-screen'), 'achievements-screen': document.getElementById('achievements-screen'), 'how-to-play-screen': document.getElementById('how-to-play-screen'), 'settings-screen': document.getElementById('settings-screen'), 'game-over-screen': document.getElementById('game-over-screen') }
+                loreContent: document.getElementById('lore-content'), hushIndicator: document.getElementById('hush-indicator'), nextRoomHint: document.getElementById('next-room-hint'),
+                runSummaryEl: document.getElementById('run-summary'), runStatsEl: document.getElementById('run-stats'), gameOverTitle: document.getElementById('game-over-title'), gameOverReason: document.getElementById('game-over-reason'),
+                itemTimersContainer: document.getElementById('item-timers-container'),
+                screens: { 'main-menu': document.getElementById('main-menu'), 'shop-screen': document.getElementById('shop-screen'), 'achievements-screen': document.getElementById('achievements-screen'), 'how-to-play-screen': document.getElementById('how-to-play-screen'), 'settings-screen': document.getElementById('settings-screen'), 'game-over-screen': document.getElementById('game-over-screen'), 'lore-screen': document.getElementById('lore-screen') }
             };
             this.audio.init(); this.persistence.load(); this.ui.updateAllTexts();
             document.getElementById('enter-shop-button').addEventListener('click', () => { this.state.preRunInventory = { items: {}, itemUses: { flashlight: 0, skeleton_key: 0 }}; this.ui.renderShop(); this.ui.showScreen('shop-screen'); });
             document.getElementById('how-to-play-button').addEventListener('click', () => { this.ui.renderHowToPlay(); this.ui.showScreen('how-to-play-screen'); });
             document.getElementById('achievements-button').addEventListener('click', () => { this.ui.renderAchievements(); this.ui.showScreen('achievements-screen'); });
             document.getElementById('settings-button').addEventListener('click', () => this.ui.showScreen('settings-screen'));
+            document.getElementById('lore-button').addEventListener('click', () => { this.ui.renderLore(); this.ui.showScreen('lore-screen'); });
             document.querySelectorAll('.back-to-menu-button, #return-to-lobby-button').forEach(btn => btn.addEventListener('click', () => { this.ui.updateMainMenu(); this.ui.showScreen('main-menu'); }));
             document.getElementById('reset-data-button').addEventListener('click', () => this.persistence.reset());
             document.querySelectorAll('.lang-button').forEach(btn => btn.addEventListener('click', (e) => { this.state.saveData.language = e.target.dataset.lang; this.persistence.save(); this.ui.updateAllTexts(); if (document.getElementById('shop-screen').style.display === 'flex') { this.ui.renderShop(); } }));
@@ -885,7 +1284,32 @@
                     this.audio.play('coin_sound'); this.ui.renderShop();
                 }
             });
-            this.audio.setup().then(() => console.log("Hotel Horror (Guaranteed Closet Version). All systems ready.")).catch(error => console.error("Critical error during audio setup:", error));
+            this.dom.inventoryEl.addEventListener('click', (e) => {
+                if (e.target.matches('.item-icon.usable')) {
+                    const itemId = e.target.dataset.item;
+                    const { state, ui, utils, gameplay } = this;
+                    if (itemId === 'adrenaline_shot' && ['rush', 'ambush'].includes(state.currentEvent)) {
+                        state.gameState.items.adrenaline_shot--; gameplay.useItem('adrenaline_shot');
+                        state.gameState.adrenalineUsed = true;
+                        ui.showCentralMessage(utils.getLangString('msg_adrenaline_used'), 1500, 'safe');
+                        if (state.eventAbortController) state.eventAbortController.abort();
+                    }
+                    if (itemId === 'music_box' && !state.gameState.musicBoxActive) {
+                        state.gameState.items.music_box--; gameplay.useItem('music_box');
+                        state.gameState.musicBoxActive = true;
+                        this.audio.play('music_box_sound');
+                        ui.showItemTimer(itemId, 10000);
+                        ui.showCentralMessage(utils.getLangString('msg_music_box_playing'), 10000, 'safe');
+                        state.gameState.noiseLevel = 0;
+                        if(state.currentEvent === 'eyes' || state.currentEvent === 'screech') {
+                           if (state.eventAbortController) state.eventAbortController.abort();
+                        }
+                        setTimeout(() => state.gameState.musicBoxActive = false, 10000);
+                    }
+                    ui.updateGameUI();
+                }
+            });
+            this.audio.setup().then(() => console.log("Hotel Horror (Malignant Expansion). All systems ready.")).catch(error => console.error("Critical error during audio setup:", error));
         }
     };
     HotelHorrorGame.init();
